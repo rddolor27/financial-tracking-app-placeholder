@@ -12,5 +12,6 @@
     "incremental": true,
     "removeComments": true,
     "strictPropertyInitialization": false
-  }
+  },
+  "exclude": ["dist", "node_modules"]
 }
