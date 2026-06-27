@@ -45,7 +45,7 @@ export function convertCurrency(
 }
 
 export function parseCurrencyAmount(value: string): number | null {
-  const cleaned = value.replace(/[^0-9.,\-]/g, '').replace(/,/g, '');
+  const cleaned = value.replace(/[^0-9.,-]/g, '').replace(/,/g, '');
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? null : parsed;
 }

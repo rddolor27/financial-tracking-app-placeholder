@@ -8,7 +8,7 @@ export interface ParsedTransaction {
 
 // Pattern: date  description  [+/-]amount
 const TRANSACTION_PATTERN =
-  /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})\s+(.+?)\s+([+-]?\s*(?:PHP|USD|EUR|₱|\$|€)?\s*[\d,]+\.?\d*)/gi;
+  /(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\s+(.+?)\s+([+-]?\s*(?:PHP|USD|EUR|₱|\$|€)?\s*[\d,]+\.?\d*)/gi;
 
 export function parseTransactionsFromText(text: string): ParsedTransaction[] {
   const transactions: ParsedTransaction[] = [];
@@ -46,10 +46,11 @@ export function parseTransactionsFromText(text: string): ParsedTransaction[] {
 }
 
 function normalizeDate(dateStr: string): string {
-  const parts = dateStr.split(/[\/\-]/);
+  const parts = dateStr.split(/[/-]/);
   if (parts.length !== 3) return dateStr;
 
-  let [month, day, year] = parts;
+  const [month, day] = parts;
+  let year = parts[2];
   if (year.length === 2) {
     year = `20${year}`;
   }

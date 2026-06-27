@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import type { DataSource } from 'typeorm';
 import { SubscriptionPlan } from '../../modules/subscriptions/subscription-plan.entity';
 
 const FREE_FEATURES = {

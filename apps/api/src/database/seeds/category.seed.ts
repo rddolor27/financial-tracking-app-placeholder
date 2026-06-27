@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { type DataSource, IsNull } from 'typeorm';
 import { Category } from '../../modules/categories/category.entity';
 
 interface DefaultCategory {
@@ -38,7 +38,7 @@ export async function seedCategories(dataSource: DataSource): Promise<void> {
 
   for (const cat of allDefaults) {
     const existing = await repo.findOne({
-      where: { name: cat.name, user_id: undefined as unknown as null, is_default: true },
+      where: { name: cat.name, user_id: IsNull(), is_default: true },
     });
 
     if (!existing) {

@@ -1,4 +1,4 @@
-import { parseTransactionsFromText, ParsedTransaction } from './parser';
+import { parseTransactionsFromText, type ParsedTransaction } from './parser';
 
 describe('parseTransactionsFromText', () => {
   it('should parse basic transaction lines', () => {

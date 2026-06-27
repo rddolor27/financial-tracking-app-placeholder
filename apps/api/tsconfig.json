@@ -10,6 +10,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "removeComments": true
+    "removeComments": true,
+    "strictPropertyInitialization": false
   }
 }
