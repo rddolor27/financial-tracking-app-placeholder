@@ -15,6 +15,7 @@ import { InvestmentsModule } from './modules/investments/investments.module';
 import { GoalsModule } from './modules/goals/goals.module';
 import { BillRemindersModule } from './modules/bill-reminders/bill-reminders.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { StatementsModule } from './modules/statements/statements.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     GoalsModule,
     BillRemindersModule,
     NotificationsModule,
+    StatementsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
