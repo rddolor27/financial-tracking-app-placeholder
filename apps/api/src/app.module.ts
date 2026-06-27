@@ -11,6 +11,10 @@ import { AccountsModule } from './modules/accounts/accounts.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { BudgetsModule } from './modules/budgets/budgets.module';
+import { InvestmentsModule } from './modules/investments/investments.module';
+import { GoalsModule } from './modules/goals/goals.module';
+import { BillRemindersModule } from './modules/bill-reminders/bill-reminders.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -34,6 +38,10 @@ import { BudgetsModule } from './modules/budgets/budgets.module';
     CategoriesModule,
     TransactionsModule,
     BudgetsModule,
+    InvestmentsModule,
+    GoalsModule,
+    BillRemindersModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
