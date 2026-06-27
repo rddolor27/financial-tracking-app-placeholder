@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Transaction } from '../transactions/transaction.entity';
+import * as ExcelJS from 'exceljs';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export interface ExportData {
   transactions: Array<{
@@ -48,5 +51,113 @@ export class ExportService {
     );
 
     return [headers, ...rows].join('\n');
+  }
+
+  async exportExcel(userId: string, startDate: string, endDate: string): Promise<Buffer> {
+    const data = await this.getExportData(userId, startDate, endDate);
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Financial Tracker';
+    workbook.created = new Date();
+
+    const sheet = workbook.addWorksheet('Transactions');
+
+    sheet.columns = [
+      { header: 'Date', key: 'date', width: 15 },
+      { header: 'Description', key: 'description', width: 30 },
+      { header: 'Type', key: 'type', width: 12 },
+      { header: 'Amount', key: 'amount', width: 15 },
+    ];
+
+    // Style header row
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF4A90D9' },
+    };
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+    for (const t of data.transactions) {
+      const row = sheet.addRow({
+        date: t.date,
+        description: t.description || '',
+        type: t.type,
+        amount: t.amount,
+      });
+
+      // Color income green, expense red
+      const amountCell = row.getCell('amount');
+      if (t.type === 'income') {
+        amountCell.font = { color: { argb: 'FF22C55E' } };
+      } else if (t.type === 'expense') {
+        amountCell.font = { color: { argb: 'FFEF4444' } };
+      }
+    }
+
+    // Add summary
+    const totalIncome = data.transactions
+      .filter((t) => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+    const totalExpense = data.transactions
+      .filter((t) => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    sheet.addRow([]);
+    sheet.addRow(['', 'Total Income', '', totalIncome]);
+    sheet.addRow(['', 'Total Expenses', '', totalExpense]);
+    sheet.addRow(['', 'Net', '', totalIncome - totalExpense]);
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+  }
+
+  async exportPdf(userId: string, startDate: string, endDate: string): Promise<Buffer> {
+    const data = await this.getExportData(userId, startDate, endDate);
+
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(18);
+    doc.text('Financial Tracker - Transaction Report', 14, 22);
+
+    doc.setFontSize(10);
+    doc.text(`Period: ${startDate} to ${endDate}`, 14, 30);
+
+    // Table
+    const tableData = data.transactions.map((t) => [
+      t.date,
+      t.description || '',
+      t.type,
+      t.amount.toFixed(2),
+    ]);
+
+    autoTable(doc, {
+      head: [['Date', 'Description', 'Type', 'Amount']],
+      body: tableData,
+      startY: 36,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [74, 144, 217] },
+    });
+
+    // Summary
+    const totalIncome = data.transactions
+      .filter((t) => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+    const totalExpense = data.transactions
+      .filter((t) => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const finalY = (doc as any).lastAutoTable?.finalY ?? 50;
+
+    doc.setFontSize(11);
+    doc.text(`Total Income: ${totalIncome.toFixed(2)}`, 14, finalY + 12);
+    doc.text(`Total Expenses: ${totalExpense.toFixed(2)}`, 14, finalY + 20);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Net: ${(totalIncome - totalExpense).toFixed(2)}`, 14, finalY + 28);
+
+    return Buffer.from(doc.output('arraybuffer'));
   }
 }

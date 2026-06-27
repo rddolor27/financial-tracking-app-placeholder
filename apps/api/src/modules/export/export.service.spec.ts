@@ -38,4 +38,24 @@ describe('ExportService', () => {
     expect(csv).toContain('Coffee');
     expect(csv).toContain('50000');
   });
+
+  it('should export Excel as Buffer', async () => {
+    repo.find.mockResolvedValue([
+      { date: '2026-01-15', description: 'Coffee', type: 'expense', amount: 150 },
+    ]);
+
+    const buffer = await service.exportExcel('u1', '2026-01-01', '2026-01-31');
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
+  });
+
+  it('should export PDF as Buffer', async () => {
+    repo.find.mockResolvedValue([
+      { date: '2026-01-15', description: 'Groceries', type: 'expense', amount: 2500 },
+    ]);
+
+    const buffer = await service.exportPdf('u1', '2026-01-01', '2026-01-31');
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
+  });
 });

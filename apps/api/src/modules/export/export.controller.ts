@@ -21,6 +21,32 @@ export class ExportController {
     res.send(csv);
   }
 
+  @Get('excel')
+  async exportExcel(
+    @Req() req: { user: { id: string } },
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Res() res: Response,
+  ) {
+    const buffer = await this.exportService.exportExcel(req.user.id, startDate, endDate);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="transactions_${startDate}_${endDate}.xlsx"`);
+    res.send(buffer);
+  }
+
+  @Get('pdf')
+  async exportPdf(
+    @Req() req: { user: { id: string } },
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Res() res: Response,
+  ) {
+    const buffer = await this.exportService.exportPdf(req.user.id, startDate, endDate);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="transactions_${startDate}_${endDate}.pdf"`);
+    res.send(buffer);
+  }
+
   @Get('json')
   async exportJson(
     @Req() req: { user: { id: string } },
