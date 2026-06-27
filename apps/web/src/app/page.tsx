@@ -1,14 +1,24 @@
+'use client';
+
+import { useAuthStore } from '@financial-tracker/store';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 export default function Home() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/dashboard');
+    } else {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, router]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center min-h-screen">
-      <main className="flex flex-col items-center gap-6 text-center p-8">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Financial Tracker
-        </h1>
-        <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-md">
-          Track your finances, investments, and spending in one place.
-        </p>
-      </main>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
     </div>
   );
 }

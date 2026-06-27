@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  transpilePackages: [
+    '@financial-tracker/shared-types',
+    '@financial-tracker/shared-utils',
+    '@financial-tracker/api-client',
+    '@financial-tracker/query-hooks',
+    '@financial-tracker/store',
+  ],
+  output: 'standalone',
 };
 
 export default nextConfig;
