@@ -1,2 +1,1 @@
-// @financial-tracker/query-hooks
-// Shared TanStack Query hooks
+export { queryKeys } from './query-keys';
