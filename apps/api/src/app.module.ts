@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { dataSourceOptions } from './database/data-source';
@@ -16,6 +17,9 @@ import { GoalsModule } from './modules/goals/goals.module';
 import { BillRemindersModule } from './modules/bill-reminders/bill-reminders.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { StatementsModule } from './modules/statements/statements.module';
+import { SyncModule } from './modules/sync/sync.module';
+import { ImportModule } from './modules/import/import.module';
+import { InsightsModule } from './modules/insights/insights.module';
 
 @Module({
   imports: [
@@ -33,6 +37,7 @@ import { StatementsModule } from './modules/statements/statements.module';
         limit: 60,
       },
     ]),
+    ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
     AccountsModule,
@@ -44,6 +49,9 @@ import { StatementsModule } from './modules/statements/statements.module';
     BillRemindersModule,
     NotificationsModule,
     StatementsModule,
+    SyncModule,
+    ImportModule,
+    InsightsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
