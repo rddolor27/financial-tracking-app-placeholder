@@ -5,8 +5,20 @@ import type {
   CreateTransaction,
   CreateCategory,
   CreateBudget,
+  CreateGoal,
+  ContributeGoal,
+  CreateBillReminder,
+  CreateInvestment,
 } from '@financial-tracker/shared-types';
-import { accountsService, transactionsService, categoriesService, budgetsService } from './api';
+import {
+  accountsService,
+  transactionsService,
+  categoriesService,
+  budgetsService,
+  goalsService,
+  billRemindersService,
+  investmentsService,
+} from './api';
 
 // ---- Accounts ----
 
@@ -95,5 +107,88 @@ export function useCreateBudget() {
   return useMutation({
     mutationFn: (data: CreateBudget) => budgetsService.create(data),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.budgets.all }),
+  });
+}
+
+// ---- Goals ----
+
+export function useGoals() {
+  return useQuery({
+    queryKey: queryKeys.goals.all,
+    queryFn: () => goalsService.getAll(),
+  });
+}
+
+export function useCreateGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateGoal) => goalsService.create(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.goals.all }),
+  });
+}
+
+export function useContributeGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ContributeGoal }) => goalsService.contribute(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.goals.all }),
+  });
+}
+
+export function useDeleteGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => goalsService.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.goals.all }),
+  });
+}
+
+// ---- Bill Reminders ----
+
+export function useBillReminders() {
+  return useQuery({
+    queryKey: queryKeys.billReminders.all,
+    queryFn: () => billRemindersService.getAll(),
+  });
+}
+
+export function useCreateBillReminder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateBillReminder) => billRemindersService.create(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.billReminders.all }),
+  });
+}
+
+export function useDeleteBillReminder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => billRemindersService.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.billReminders.all }),
+  });
+}
+
+// ---- Investments ----
+
+export function useInvestments() {
+  return useQuery({
+    queryKey: queryKeys.investments.all,
+    queryFn: () => investmentsService.getAll(),
+  });
+}
+
+export function useCreateInvestment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateInvestment) => investmentsService.create(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.investments.all }),
+  });
+}
+
+export function useDeleteInvestment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => investmentsService.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.investments.all }),
   });
 }

@@ -5,6 +5,9 @@ import {
   CategoriesService,
   TransactionsService,
   BudgetsService,
+  GoalsService,
+  BillRemindersService,
+  InvestmentsService,
 } from '@financial-tracker/api-client';
 import { authStore } from '@financial-tracker/store';
 import { clearTokens, setTokens } from './secure-storage';
@@ -36,3 +39,6 @@ export const accountsService = new AccountsService(apiClient);
 export const categoriesService = new CategoriesService(apiClient);
 export const transactionsService = new TransactionsService(apiClient);
 export const budgetsService = new BudgetsService(apiClient);
+export const goalsService = new GoalsService(apiClient);
+export const billRemindersService = new BillRemindersService(apiClient);
+export const investmentsService = new InvestmentsService(apiClient);

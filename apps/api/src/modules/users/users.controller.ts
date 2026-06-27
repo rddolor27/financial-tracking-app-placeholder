@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Body,
   UseGuards,
@@ -36,5 +37,15 @@ export class UsersController {
     const user = await this.usersService.update(req.user.id, body);
     const { password_hash: _ph, google_id: _gid, ...profile } = user;
     return profile;
+  }
+
+  @Post('me/password')
+  @UseGuards(JwtAuthGuard)
+  async changePassword(
+    @Req() req: { user: { id: string } },
+    @Body() body: { current_password: string; new_password: string },
+  ) {
+    await this.usersService.changePassword(req.user.id, body.current_password, body.new_password);
+    return { message: 'Password changed successfully' };
   }
 }

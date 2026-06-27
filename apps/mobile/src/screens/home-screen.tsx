@@ -1,11 +1,15 @@
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuthStore } from '@financial-tracker/store';
 import { useAccounts, useTransactions } from '../lib/crud-hooks';
 import { formatCurrency } from '@financial-tracker/shared-utils';
 import { useThemeColors } from '../lib/use-theme';
+import type { MainStackParamList } from '../navigation/root-navigator';
 
 export function HomeScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
   const user = useAuthStore((s) => s.user);
   const { data: accountsData } = useAccounts();
   const { data: txData } = useTransactions({ limit: 5 });
@@ -49,6 +53,25 @@ export function HomeScreen() {
         </View>
       )}
 
+      {/* Quick Links */}
+      <View style={[styles.section, { paddingHorizontal: 20 }]}>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          {[
+            { label: 'Goals', screen: 'Goals' as const },
+            { label: 'Bills', screen: 'Bills' as const },
+            { label: 'Investments', screen: 'Investments' as const },
+          ].map((item) => (
+            <TouchableOpacity
+              key={item.screen}
+              onPress={() => navigation.navigate(item.screen)}
+              style={[styles.quickLink, { backgroundColor: colors.card, borderColor: colors.border }]}
+            >
+              <Text style={[styles.quickLinkText, { color: colors.primary }]}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
       {/* Recent Transactions */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent Transactions</Text>
@@ -87,4 +110,6 @@ const styles = StyleSheet.create({
   rowSub: { fontSize: 13, marginTop: 2 },
   rowAmount: { fontSize: 15, fontWeight: '700' },
   emptyText: { paddingHorizontal: 20, fontSize: 14 },
+  quickLink: { flex: 1, borderWidth: 1, borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
+  quickLinkText: { fontSize: 14, fontWeight: '600' },
 });

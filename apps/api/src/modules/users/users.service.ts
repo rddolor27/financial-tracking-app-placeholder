@@ -2,7 +2,9 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -42,5 +44,25 @@ export class UsersService {
     }
     this.usersRepo.merge(user, data);
     return this.usersRepo.save(user);
+  }
+
+  async changePassword(
+    id: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!user.password_hash) {
+      throw new BadRequestException('Account uses Google authentication only');
+    }
+    const valid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!valid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+    user.password_hash = await bcrypt.hash(newPassword, 10);
+    await this.usersRepo.save(user);
   }
 }

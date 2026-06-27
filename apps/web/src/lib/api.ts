@@ -9,6 +9,9 @@ import {
   BillRemindersService,
   InvestmentsService,
   InsightsService,
+  ExportService,
+  ImportService,
+  UsersService,
 } from '@financial-tracker/api-client';
 import { authStore } from '@financial-tracker/store';
 import { env } from './env';
@@ -44,3 +47,6 @@ export const goalsService = new GoalsService(apiClient);
 export const billRemindersService = new BillRemindersService(apiClient);
 export const investmentsService = new InvestmentsService(apiClient);
 export const insightsService = new InsightsService(apiClient);
+export const exportService = new ExportService(apiClient);
+export const importService = new ImportService(apiClient);
+export const usersService = new UsersService(apiClient);
