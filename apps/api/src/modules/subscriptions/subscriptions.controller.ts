@@ -1,0 +1,46 @@
+import { Controller, Get, Post, Body, UseGuards, Req, Delete } from '@nestjs/common';
+import { SubscriptionsService } from './subscriptions.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
+@Controller('subscriptions')
+export class SubscriptionsController {
+  constructor(private readonly subscriptionsService: SubscriptionsService) {}
+
+  @Get('plans')
+  async getPlans() {
+    return this.subscriptionsService.getPlans();
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getMySubscription(@Req() req: { user: { id: string } }) {
+    return this.subscriptionsService.getUserSubscription(req.user.id);
+  }
+
+  @Get('features')
+  @UseGuards(JwtAuthGuard)
+  async getMyFeatures(@Req() req: { user: { id: string } }) {
+    return this.subscriptionsService.getUserFeatures(req.user.id);
+  }
+
+  @Post('subscribe')
+  @UseGuards(JwtAuthGuard)
+  async subscribe(
+    @Req() req: { user: { id: string } },
+    @Body() body: { plan_id: string; platform: 'web' | 'mobile' },
+  ) {
+    return this.subscriptionsService.createSubscription(req.user.id, body.plan_id, body.platform);
+  }
+
+  @Delete('cancel')
+  @UseGuards(JwtAuthGuard)
+  async cancel(@Req() req: { user: { id: string } }) {
+    return this.subscriptionsService.cancelSubscription(req.user.id);
+  }
+
+  @Get('payments')
+  @UseGuards(JwtAuthGuard)
+  async getPayments(@Req() req: { user: { id: string } }) {
+    return this.subscriptionsService.getUserPayments(req.user.id);
+  }
+}

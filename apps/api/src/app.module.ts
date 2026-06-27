@@ -20,6 +20,9 @@ import { StatementsModule } from './modules/statements/statements.module';
 import { SyncModule } from './modules/sync/sync.module';
 import { ImportModule } from './modules/import/import.module';
 import { InsightsModule } from './modules/insights/insights.module';
+import { ExchangeRatesModule } from './modules/exchange-rates/exchange-rates.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { ExportModule } from './modules/export/export.module';
 
 @Module({
   imports: [
@@ -52,6 +55,9 @@ import { InsightsModule } from './modules/insights/insights.module';
     SyncModule,
     ImportModule,
     InsightsModule,
+    ExchangeRatesModule,
+    SubscriptionsModule,
+    ExportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
