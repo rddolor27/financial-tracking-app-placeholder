@@ -1,0 +1,29 @@
+{
+  "name": "@financial-tracker/query-hooks",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "lint": "eslint src/",
+    "test": "jest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@financial-tracker/api-client": "workspace:*",
+    "@financial-tracker/shared-types": "workspace:*",
+    "@tanstack/react-query": "^5.80.7"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/react": "^18.3.23",
+    "jest": "^29.7.0",
+    "react": "^18.3.1",
+    "ts-jest": "^29.3.4",
+    "typescript": "^5.8.3"
+  }
+}

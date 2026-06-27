@@ -1,0 +1,27 @@
+{
+  "name": "@financial-tracker/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "build": "echo 'Mobile build handled by EAS'",
+    "lint": "eslint src/",
+    "test": "jest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@financial-tracker/shared-types": "workspace:*",
+    "@financial-tracker/shared-utils": "workspace:*",
+    "@financial-tracker/api-client": "workspace:*",
+    "@financial-tracker/query-hooks": "workspace:*",
+    "@financial-tracker/store": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.4",
+    "typescript": "^5.8.3"
+  }
+}
