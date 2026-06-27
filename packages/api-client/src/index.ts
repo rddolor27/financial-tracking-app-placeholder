@@ -1,2 +1,3 @@
-// @financial-tracker/api-client
-// Axios instances + typed service classes
+export { createApiClient } from './client';
+export type { ApiClientConfig } from './client';
+export * from './services';
