@@ -108,6 +108,26 @@ describe('TransactionsService', () => {
     });
   });
 
+  describe('findAllByUser', () => {
+    it('should add search filter when search option is provided', async () => {
+      const mockQb = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        addOrderBy: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+      repo.createQueryBuilder.mockReturnValue(mockQb);
+
+      await service.findAllByUser('u1', { search: 'groceries' });
+      expect(mockQb.andWhere).toHaveBeenCalledWith(
+        expect.stringContaining('plainto_tsquery'),
+        { search: 'groceries' },
+      );
+    });
+  });
+
   describe('remove', () => {
     it('should remove the transaction and reverse balance', async () => {
       const tx = {

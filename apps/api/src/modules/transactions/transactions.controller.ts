@@ -33,6 +33,7 @@ export class TransactionsController {
     @Query('type') type?: string,
     @Query('start_date') startDate?: string,
     @Query('end_date') endDate?: string,
+    @Query('search') search?: string,
     @Query('cursor') cursor?: string,
     @Query('limit') limit?: string,
   ) {
@@ -42,6 +43,7 @@ export class TransactionsController {
       type,
       startDate,
       endDate,
+      search,
       cursor,
       limit: limit ? parseInt(limit, 10) : undefined,
     });

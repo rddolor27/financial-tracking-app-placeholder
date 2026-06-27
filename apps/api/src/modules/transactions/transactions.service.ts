@@ -20,6 +20,7 @@ export class TransactionsService {
       type?: string;
       startDate?: string;
       endDate?: string;
+      search?: string;
       cursor?: string;
       limit?: number;
     },
@@ -48,6 +49,12 @@ export class TransactionsService {
     }
     if (options?.endDate) {
       qb.andWhere('tx.date <= :endDate', { endDate: options.endDate });
+    }
+    if (options?.search) {
+      qb.andWhere(
+        `(to_tsvector('english', COALESCE(tx.description, '') || ' ' || array_to_string(tx.tags, ' ')) @@ plainto_tsquery('english', :search))`,
+        { search: options.search },
+      );
     }
     if (options?.cursor) {
       qb.andWhere('tx.id < :cursor', { cursor: options.cursor });

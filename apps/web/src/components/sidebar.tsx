@@ -14,6 +14,7 @@ const navItems = [
   { href: '/investments', label: 'Investments' },
   { href: '/goals', label: 'Goals' },
   { href: '/bills', label: 'Bill Reminders' },
+  { href: '/insights', label: 'Insights' },
 ];
 
 export function Sidebar() {

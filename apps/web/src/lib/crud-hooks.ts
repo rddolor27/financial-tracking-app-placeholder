@@ -6,13 +6,28 @@ import type {
   CreateAccount,
   UpdateAccount,
   CreateTransaction,
-  UpdateTransaction,
   CreateCategory,
   UpdateCategory,
   CreateBudget,
   UpdateBudget,
+  CreateGoal,
+  UpdateGoal,
+  ContributeGoal,
+  CreateBillReminder,
+  UpdateBillReminder,
+  CreateInvestment,
+  UpdateInvestment,
 } from '@financial-tracker/shared-types';
-import { accountsService, transactionsService, categoriesService, budgetsService } from './api';
+import {
+  accountsService,
+  transactionsService,
+  categoriesService,
+  budgetsService,
+  goalsService,
+  billRemindersService,
+  investmentsService,
+  insightsService,
+} from './api';
 
 // ---- Accounts ----
 
@@ -149,5 +164,146 @@ export function useDeleteBudget() {
   return useMutation({
     mutationFn: (id: string) => budgetsService.delete(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.budgets.all }),
+  });
+}
+
+// ---- Goals ----
+
+export function useGoals() {
+  return useQuery({
+    queryKey: queryKeys.goals.all,
+    queryFn: () => goalsService.getAll(),
+  });
+}
+
+export function useCreateGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateGoal) => goalsService.create(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.goals.all }),
+  });
+}
+
+export function useUpdateGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateGoal }) => goalsService.update(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.goals.all }),
+  });
+}
+
+export function useContributeGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ContributeGoal }) => goalsService.contribute(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.goals.all }),
+  });
+}
+
+export function useDeleteGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => goalsService.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.goals.all }),
+  });
+}
+
+// ---- Bill Reminders ----
+
+export function useBillReminders() {
+  return useQuery({
+    queryKey: queryKeys.billReminders.all,
+    queryFn: () => billRemindersService.getAll(),
+  });
+}
+
+export function useCreateBillReminder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateBillReminder) => billRemindersService.create(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.billReminders.all }),
+  });
+}
+
+export function useUpdateBillReminder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateBillReminder }) => billRemindersService.update(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.billReminders.all }),
+  });
+}
+
+export function useDeleteBillReminder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => billRemindersService.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.billReminders.all }),
+  });
+}
+
+// ---- Investments ----
+
+export function useInvestments() {
+  return useQuery({
+    queryKey: queryKeys.investments.all,
+    queryFn: () => investmentsService.getAll(),
+  });
+}
+
+export function useCreateInvestment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateInvestment) => investmentsService.create(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.investments.all }),
+  });
+}
+
+export function useUpdateInvestment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateInvestment }) => investmentsService.update(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.investments.all }),
+  });
+}
+
+export function useDeleteInvestment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => investmentsService.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.investments.all }),
+  });
+}
+
+// ---- Insights ----
+
+export function useSpendingByCategory(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: queryKeys.insights.spendingByCategory({ startDate, endDate }),
+    queryFn: () => insightsService.spendingByCategory(startDate, endDate),
+    enabled: !!startDate && !!endDate,
+  });
+}
+
+export function useIncomeVsExpense(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: queryKeys.insights.incomeVsExpense({ startDate, endDate }),
+    queryFn: () => insightsService.incomeVsExpense(startDate, endDate),
+    enabled: !!startDate && !!endDate,
+  });
+}
+
+export function useTrends(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: queryKeys.insights.trends({ startDate, endDate }),
+    queryFn: () => insightsService.trends(startDate, endDate),
+    enabled: !!startDate && !!endDate,
+  });
+}
+
+export function useSavingsRate(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: queryKeys.insights.savingsRate({ startDate, endDate }),
+    queryFn: () => insightsService.savingsRate(startDate, endDate),
+    enabled: !!startDate && !!endDate,
   });
 }
