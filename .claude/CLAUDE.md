@@ -294,6 +294,15 @@ pnpm --filter mobile drizzle-kit drop          # dev only
 ### Out of Scope
 - Shared accounts / family mode — explicitly excluded
 
+## Git Commits
+- Commit significant changes but break them down into small, focused commits
+- Keep commit messages simple and short (e.g., `add user entity`, `fix login redirect`)
+- No co-author tags
+- Descriptions (if needed) should be brief, not wordy — one line max
+- Don't bundle unrelated changes into a single commit
+- ONLY commit and operate within this project (`Financial-Tracker-V2`). NEVER touch, modify, or commit in any other project or directory on the machine
+- Never push to remote unless explicitly asked
+
 ## File Naming
 - TypeScript files: `kebab-case.ts` / `kebab-case.tsx`
 - Test files: `kebab-case.spec.ts`
