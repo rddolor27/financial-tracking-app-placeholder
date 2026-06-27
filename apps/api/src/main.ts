@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { apiReference } from '@scalar/nestjs-api-reference';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
@@ -19,7 +20,15 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document);
+    SwaggerModule.setup('api/swagger', app, document);
+
+    app.use(
+      '/api/docs',
+      apiReference({
+        spec: { content: document },
+        theme: 'kepler',
+      }),
+    );
   }
 
   const port = process.env.API_PORT ?? process.env.PORT ?? 3000;

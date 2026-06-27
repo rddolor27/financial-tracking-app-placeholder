@@ -11,8 +11,9 @@ import {
   InsightsService,
 } from '@financial-tracker/api-client';
 import { authStore } from '@financial-tracker/store';
+import { env } from './env';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const baseURL = env.NEXT_PUBLIC_API_URL;
 
 export const apiClient = createApiClient({
   baseURL,
