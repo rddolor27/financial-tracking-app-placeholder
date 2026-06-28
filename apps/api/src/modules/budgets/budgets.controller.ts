@@ -11,7 +11,8 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { BudgetsService } from './budgets.service';
+import type { BudgetsService } from './budgets.service';
+import { InjectBudgetsService } from './budgets.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
@@ -22,7 +23,9 @@ import {
 @Controller('budgets')
 @UseGuards(JwtAuthGuard)
 export class BudgetsController {
-  constructor(private readonly budgetsService: BudgetsService) {}
+  constructor(
+    @InjectBudgetsService() private readonly budgetsService: BudgetsService,
+  ) {}
 
   @Get()
   async findAll(@Req() req: { user: { id: string } }) {

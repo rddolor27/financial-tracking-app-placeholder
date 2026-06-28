@@ -1,0 +1,1 @@
+export const INSIGHTS_SERVICE = 'INSIGHTS_SERVICE';

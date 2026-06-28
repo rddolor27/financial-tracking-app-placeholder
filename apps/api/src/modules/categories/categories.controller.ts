@@ -11,7 +11,8 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { CategoriesService } from './categories.service';
+import type { CategoriesService } from './categories.service';
+import { InjectCategoriesService } from './categories.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
@@ -22,7 +23,9 @@ import {
 @Controller('categories')
 @UseGuards(JwtAuthGuard)
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(
+    @InjectCategoriesService() private readonly categoriesService: CategoriesService,
+  ) {}
 
   @Get()
   async findAll(@Req() req: { user: { id: string } }) {

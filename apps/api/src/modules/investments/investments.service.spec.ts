@@ -4,6 +4,8 @@ import { NotFoundException } from '@nestjs/common';
 import { InvestmentsService } from './investments.service';
 import { Investment } from './investment.entity';
 import { InvestmentTransaction } from './investment-transaction.entity';
+import { INVESTMENTS_SERVICE } from './investments.constants';
+import { InvestmentsProvider } from './investments.providers';
 
 const mockRepository = () => ({
   find: jest.fn(),
@@ -21,13 +23,13 @@ describe('InvestmentsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        InvestmentsService,
+        InvestmentsProvider,
         { provide: getRepositoryToken(Investment), useFactory: mockRepository },
         { provide: getRepositoryToken(InvestmentTransaction), useFactory: mockRepository },
       ],
     }).compile();
 
-    service = module.get<InvestmentsService>(InvestmentsService);
+    service = module.get<InvestmentsService>(INVESTMENTS_SERVICE);
     repo = module.get(getRepositoryToken(Investment));
   });
 

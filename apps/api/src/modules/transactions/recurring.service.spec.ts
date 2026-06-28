@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RecurringService } from './recurring.service';
 import { Transaction } from './transaction.entity';
+import { RECURRING_SERVICE } from './transactions.constants';
+import { RecurringProvider } from './transactions.providers';
 
 const mockRepository = () => ({
   find: jest.fn(),
@@ -16,12 +18,12 @@ describe('RecurringService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        RecurringService,
+        RecurringProvider,
         { provide: getRepositoryToken(Transaction), useFactory: mockRepository },
       ],
     }).compile();
 
-    service = module.get<RecurringService>(RecurringService);
+    service = module.get<RecurringService>(RECURRING_SERVICE);
     repo = module.get(getRepositoryToken(Transaction));
   });
 

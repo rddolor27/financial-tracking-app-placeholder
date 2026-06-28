@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ImportService } from './import.service';
 import { Transaction } from '../transactions/transaction.entity';
 import { Account } from '../accounts/account.entity';
+import { IMPORT_SERVICE } from './import.constants';
+import { ImportProvider } from './import.providers';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -17,13 +19,13 @@ describe('ImportService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ImportService,
+        ImportProvider,
         { provide: getRepositoryToken(Transaction), useFactory: mockRepo },
         { provide: getRepositoryToken(Account), useFactory: mockRepo },
       ],
     }).compile();
 
-    service = module.get<ImportService>(ImportService);
+    service = module.get<ImportService>(IMPORT_SERVICE);
   });
 
   it('should be defined', () => {

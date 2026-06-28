@@ -1,6 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { SubscriptionsService } from './subscriptions.service';
+import type { SubscriptionsService } from './subscriptions.service';
+import { InjectSubscriptionsService } from './subscriptions.providers';
 
 export const REQUIRED_FEATURE_KEY = 'required_feature';
 
@@ -17,7 +18,7 @@ export function RequireFeature(feature: string) {
 export class SubscriptionGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly subscriptionsService: SubscriptionsService,
+    @InjectSubscriptionsService() private readonly subscriptionsService: SubscriptionsService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

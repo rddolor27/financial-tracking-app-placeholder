@@ -5,6 +5,8 @@ import { Account } from '../accounts/account.entity';
 import { Category } from '../categories/category.entity';
 import { Transaction } from '../transactions/transaction.entity';
 import { Budget } from '../budgets/budget.entity';
+import { SYNC_SERVICE } from './sync.constants';
+import { SyncProvider } from './sync.providers';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -20,7 +22,7 @@ describe('SyncService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        SyncService,
+        SyncProvider,
         { provide: getRepositoryToken(Account), useFactory: mockRepo },
         { provide: getRepositoryToken(Category), useFactory: mockRepo },
         { provide: getRepositoryToken(Transaction), useFactory: mockRepo },
@@ -28,7 +30,7 @@ describe('SyncService', () => {
       ],
     }).compile();
 
-    service = module.get<SyncService>(SyncService);
+    service = module.get<SyncService>(SYNC_SERVICE);
   });
 
   it('should be defined', () => {

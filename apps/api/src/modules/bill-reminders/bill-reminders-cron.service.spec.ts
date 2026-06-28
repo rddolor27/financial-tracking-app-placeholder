@@ -4,6 +4,8 @@ import { BillRemindersCronService } from './bill-reminders-cron.service';
 import { BillReminder } from './bill-reminder.entity';
 import { Notification } from '../notifications/notification.entity';
 import { Transaction } from '../transactions/transaction.entity';
+import { BILL_REMINDERS_CRON_SERVICE } from './bill-reminders.constants';
+import { BillRemindersCronProvider } from './bill-reminders.providers';
 
 const mockBillsRepo = () => ({
   find: jest.fn(),
@@ -28,14 +30,14 @@ describe('BillRemindersCronService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        BillRemindersCronService,
+        BillRemindersCronProvider,
         { provide: getRepositoryToken(BillReminder), useFactory: mockBillsRepo },
         { provide: getRepositoryToken(Notification), useFactory: mockNotificationsRepo },
         { provide: getRepositoryToken(Transaction), useFactory: mockTransactionsRepo },
       ],
     }).compile();
 
-    service = module.get<BillRemindersCronService>(BillRemindersCronService);
+    service = module.get<BillRemindersCronService>(BILL_REMINDERS_CRON_SERVICE);
     billsRepo = module.get(getRepositoryToken(BillReminder));
     notificationsRepo = module.get(getRepositoryToken(Notification));
   });

@@ -1,11 +1,14 @@
 import { Controller, Get, Query, UseGuards, Req } from '@nestjs/common';
-import { InsightsService } from './insights.service';
+import type { InsightsService } from './insights.service';
+import { InjectInsightsService } from './insights.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('insights')
 @UseGuards(JwtAuthGuard)
 export class InsightsController {
-  constructor(private readonly insightsService: InsightsService) {}
+  constructor(
+    @InjectInsightsService() private readonly insightsService: InsightsService,
+  ) {}
 
   @Get('spending-by-category')
   async spendingByCategory(

@@ -6,7 +6,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
+import { AUTH_SERVICE } from './auth.constants';
+import { AuthProvider } from './auth.providers';
+import { USERS_SERVICE } from '../users/users.constants';
 import { RefreshToken } from './refresh-token.entity';
 import type { User } from '../users/user.entity';
 
@@ -54,8 +56,8 @@ describe('AuthService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AuthService,
-        { provide: UsersService, useFactory: mockUsersService },
+        AuthProvider,
+        { provide: USERS_SERVICE, useFactory: mockUsersService },
         { provide: JwtService, useFactory: mockJwtService },
         { provide: ConfigService, useFactory: mockConfigService },
         {
@@ -65,8 +67,8 @@ describe('AuthService', () => {
       ],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
-    usersService = module.get(UsersService);
+    service = module.get<AuthService>(AUTH_SERVICE);
+    usersService = module.get(USERS_SERVICE);
     jwtService = module.get(JwtService);
     refreshTokenRepo = module.get(getRepositoryToken(RefreshToken));
   });

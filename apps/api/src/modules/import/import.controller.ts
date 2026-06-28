@@ -1,11 +1,14 @@
 import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
-import { ImportService } from './import.service';
+import type { ImportService } from './import.service';
+import { InjectImportService } from './import.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('import')
 @UseGuards(JwtAuthGuard)
 export class ImportController {
-  constructor(private readonly importService: ImportService) {}
+  constructor(
+    @InjectImportService() private readonly importService: ImportService,
+  ) {}
 
   @Post('csv/preview')
   async preview(

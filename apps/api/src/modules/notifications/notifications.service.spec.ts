@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { Notification } from './notification.entity';
+import { NOTIFICATIONS_SERVICE } from './notifications.constants';
+import { NotificationsProvider } from './notifications.providers';
 
 const mockRepository = () => ({
   find: jest.fn(),
@@ -19,12 +21,12 @@ describe('NotificationsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        NotificationsService,
+        NotificationsProvider,
         { provide: getRepositoryToken(Notification), useFactory: mockRepository },
       ],
     }).compile();
 
-    service = module.get<NotificationsService>(NotificationsService);
+    service = module.get<NotificationsService>(NOTIFICATIONS_SERVICE);
     repo = module.get(getRepositoryToken(Notification));
   });
 

@@ -5,6 +5,8 @@ import type { Repository } from 'typeorm';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { USERS_SERVICE } from './users.constants';
+import { UsersProvider } from './users.providers';
 
 const mockRepository = () => ({
   findOne: jest.fn(),
@@ -20,12 +22,12 @@ describe('UsersService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UsersService,
+        UsersProvider,
         { provide: getRepositoryToken(User), useFactory: mockRepository },
       ],
     }).compile();
 
-    service = module.get<UsersService>(UsersService);
+    service = module.get<UsersService>(USERS_SERVICE);
     repo = module.get(getRepositoryToken(User));
   });
 

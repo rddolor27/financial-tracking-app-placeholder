@@ -1,12 +1,15 @@
 import { Controller, Get, Query, UseGuards, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { ExportService } from './export.service';
+import type { ExportService } from './export.service';
+import { InjectExportService } from './export.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('export')
 @UseGuards(JwtAuthGuard)
 export class ExportController {
-  constructor(private readonly exportService: ExportService) {}
+  constructor(
+    @InjectExportService() private readonly exportService: ExportService,
+  ) {}
 
   @Get('csv')
   async exportCsv(

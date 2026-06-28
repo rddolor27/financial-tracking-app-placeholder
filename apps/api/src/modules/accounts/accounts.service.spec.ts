@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { Account } from './account.entity';
+import { ACCOUNTS_SERVICE } from './accounts.constants';
+import { AccountsProvider } from './accounts.providers';
 
 const mockRepository = () => ({
   find: jest.fn(),
@@ -21,12 +23,12 @@ describe('AccountsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AccountsService,
+        AccountsProvider,
         { provide: getRepositoryToken(Account), useFactory: mockRepository },
       ],
     }).compile();
 
-    service = module.get<AccountsService>(AccountsService);
+    service = module.get<AccountsService>(ACCOUNTS_SERVICE);
     repo = module.get(getRepositoryToken(Account));
   });
 

@@ -1,10 +1,13 @@
 import { Controller, Get, Post, Body, UseGuards, Req, Delete } from '@nestjs/common';
-import { SubscriptionsService } from './subscriptions.service';
+import type { SubscriptionsService } from './subscriptions.service';
+import { InjectSubscriptionsService } from './subscriptions.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('subscriptions')
 export class SubscriptionsController {
-  constructor(private readonly subscriptionsService: SubscriptionsService) {}
+  constructor(
+    @InjectSubscriptionsService() private readonly subscriptionsService: SubscriptionsService,
+  ) {}
 
   @Get('plans')
   async getPlans() {

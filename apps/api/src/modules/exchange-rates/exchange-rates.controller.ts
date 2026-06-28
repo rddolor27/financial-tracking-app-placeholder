@@ -1,9 +1,12 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ExchangeRatesService } from './exchange-rates.service';
+import type { ExchangeRatesService } from './exchange-rates.service';
+import { InjectExchangeRatesService } from './exchange-rates.providers';
 
 @Controller('exchange-rates')
 export class ExchangeRatesController {
-  constructor(private readonly exchangeRatesService: ExchangeRatesService) {}
+  constructor(
+    @InjectExchangeRatesService() private readonly exchangeRatesService: ExchangeRatesService,
+  ) {}
 
   @Get()
   async getAll() {

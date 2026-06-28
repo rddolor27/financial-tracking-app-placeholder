@@ -3,7 +3,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { Transaction } from './transaction.entity';
-import { AccountsService } from '../accounts/accounts.service';
+import { TRANSACTIONS_SERVICE } from './transactions.constants';
+import { TransactionsProvider } from './transactions.providers';
+import { ACCOUNTS_SERVICE } from '../accounts/accounts.constants';
 
 const mockRepository = () => ({
   find: jest.fn(),
@@ -29,15 +31,15 @@ describe('TransactionsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        TransactionsService,
+        TransactionsProvider,
         { provide: getRepositoryToken(Transaction), useFactory: mockRepository },
-        { provide: AccountsService, useFactory: mockAccountsService },
+        { provide: ACCOUNTS_SERVICE, useFactory: mockAccountsService },
       ],
     }).compile();
 
-    service = module.get<TransactionsService>(TransactionsService);
+    service = module.get<TransactionsService>(TRANSACTIONS_SERVICE);
     repo = module.get(getRepositoryToken(Transaction));
-    accountsService = module.get(AccountsService);
+    accountsService = module.get(ACCOUNTS_SERVICE);
   });
 
   it('should be defined', () => {

@@ -7,14 +7,17 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import type { UsersService } from './users.service';
+import { InjectUsersService } from './users.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { UpdateUserSchema } from '@financial-tracker/shared-types';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    @InjectUsersService() private readonly usersService: UsersService,
+  ) {}
 
   @Get('me')
   @UseGuards(JwtAuthGuard)

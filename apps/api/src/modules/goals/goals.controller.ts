@@ -2,7 +2,8 @@ import {
   Controller, Get, Post, Patch, Delete, Body, Param,
   UseGuards, Req, HttpCode, HttpStatus,
 } from '@nestjs/common';
-import { GoalsService } from './goals.service';
+import type { GoalsService } from './goals.service';
+import { InjectGoalsService } from './goals.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
@@ -12,7 +13,9 @@ import {
 @Controller('goals')
 @UseGuards(JwtAuthGuard)
 export class GoalsController {
-  constructor(private readonly goalsService: GoalsService) {}
+  constructor(
+    @InjectGoalsService() private readonly goalsService: GoalsService,
+  ) {}
 
   @Get()
   async findAll(@Req() req: { user: { id: string } }) {

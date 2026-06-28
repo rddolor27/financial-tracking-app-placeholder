@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { InsightsService } from './insights.service';
 import { Transaction } from '../transactions/transaction.entity';
+import { INSIGHTS_SERVICE } from './insights.constants';
+import { InsightsProvider } from './insights.providers';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -24,12 +26,12 @@ describe('InsightsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        InsightsService,
+        InsightsProvider,
         { provide: getRepositoryToken(Transaction), useFactory: mockRepo },
       ],
     }).compile();
 
-    service = module.get<InsightsService>(InsightsService);
+    service = module.get<InsightsService>(INSIGHTS_SERVICE);
     repo = module.get(getRepositoryToken(Transaction));
   });
 

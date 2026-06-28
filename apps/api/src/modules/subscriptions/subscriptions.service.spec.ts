@@ -5,6 +5,8 @@ import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionPlan } from './subscription-plan.entity';
 import { Subscription } from './subscription.entity';
 import { Payment } from './payment.entity';
+import { SUBSCRIPTIONS_SERVICE } from './subscriptions.constants';
+import { SubscriptionsProvider } from './subscriptions.providers';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -21,14 +23,14 @@ describe('SubscriptionsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        SubscriptionsService,
+        SubscriptionsProvider,
         { provide: getRepositoryToken(SubscriptionPlan), useFactory: mockRepo },
         { provide: getRepositoryToken(Subscription), useFactory: mockRepo },
         { provide: getRepositoryToken(Payment), useFactory: mockRepo },
       ],
     }).compile();
 
-    service = module.get<SubscriptionsService>(SubscriptionsService);
+    service = module.get<SubscriptionsService>(SUBSCRIPTIONS_SERVICE);
     plansRepo = module.get(getRepositoryToken(SubscriptionPlan));
     subsRepo = module.get(getRepositoryToken(Subscription));
   });

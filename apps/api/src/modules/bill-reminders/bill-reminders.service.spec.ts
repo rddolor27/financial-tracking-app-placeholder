@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { BillRemindersService } from './bill-reminders.service';
 import { BillReminder } from './bill-reminder.entity';
+import { BILL_REMINDERS_SERVICE } from './bill-reminders.constants';
+import { BillRemindersProvider } from './bill-reminders.providers';
 
 const mockRepository = () => ({
   find: jest.fn(),
@@ -20,12 +22,12 @@ describe('BillRemindersService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        BillRemindersService,
+        BillRemindersProvider,
         { provide: getRepositoryToken(BillReminder), useFactory: mockRepository },
       ],
     }).compile();
 
-    service = module.get<BillRemindersService>(BillRemindersService);
+    service = module.get<BillRemindersService>(BILL_REMINDERS_SERVICE);
     repo = module.get(getRepositoryToken(BillReminder));
   });
 

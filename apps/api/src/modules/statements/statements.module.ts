@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Statement } from './statement.entity';
-import { StatementsService } from './statements.service';
 import { StatementsController } from './statements.controller';
+import { StatementsProvider } from './statements.providers';
+import { STATEMENTS_SERVICE } from './statements.constants';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Statement])],
   controllers: [StatementsController],
-  providers: [StatementsService],
-  exports: [StatementsService],
+  providers: [StatementsProvider],
+  exports: [STATEMENTS_SERVICE],
 })
 export class StatementsModule {}

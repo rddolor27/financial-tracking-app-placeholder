@@ -9,7 +9,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from './auth.service';
+import type { AuthService } from './auth.service';
+import { InjectAuthService } from './auth.providers';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
   CreateUserSchema,
@@ -19,7 +20,9 @@ import {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @InjectAuthService() private readonly authService: AuthService,
+  ) {}
 
   @Post('register')
   async register(

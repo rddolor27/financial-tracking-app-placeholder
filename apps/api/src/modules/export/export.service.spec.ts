@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ExportService } from './export.service';
 import { Transaction } from '../transactions/transaction.entity';
+import { EXPORT_SERVICE } from './export.constants';
+import { ExportProvider } from './export.providers';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -14,12 +16,12 @@ describe('ExportService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ExportService,
+        ExportProvider,
         { provide: getRepositoryToken(Transaction), useFactory: mockRepo },
       ],
     }).compile();
 
-    service = module.get<ExportService>(ExportService);
+    service = module.get<ExportService>(EXPORT_SERVICE);
     repo = module.get(getRepositoryToken(Transaction));
   });
 

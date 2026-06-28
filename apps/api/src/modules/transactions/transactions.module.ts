@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Transaction } from './transaction.entity';
-import { TransactionsService } from './transactions.service';
 import { TransactionsController } from './transactions.controller';
-import { RecurringService } from './recurring.service';
+import { TransactionsProvider, RecurringProvider } from './transactions.providers';
+import { TRANSACTIONS_SERVICE } from './transactions.constants';
 import { AccountsModule } from '../accounts/accounts.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Transaction]), AccountsModule],
   controllers: [TransactionsController],
-  providers: [TransactionsService, RecurringService],
-  exports: [TransactionsService],
+  providers: [TransactionsProvider, RecurringProvider],
+  exports: [TRANSACTIONS_SERVICE],
 })
 export class TransactionsModule {}

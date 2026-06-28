@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Headers, HttpCode, HttpStatus, Logger, RawBodyRequest, Req } from '@nestjs/common';
-import { SubscriptionsService } from './subscriptions.service';
+import type { SubscriptionsService } from './subscriptions.service';
+import { InjectSubscriptionsService } from './subscriptions.providers';
 import * as crypto from 'crypto';
 import { Request } from 'express';
 
@@ -29,7 +30,9 @@ interface PayMongoEvent {
 export class PayMongoWebhookController {
   private readonly logger = new Logger(PayMongoWebhookController.name);
 
-  constructor(private readonly subscriptionsService: SubscriptionsService) {}
+  constructor(
+    @InjectSubscriptionsService() private readonly subscriptionsService: SubscriptionsService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.OK)

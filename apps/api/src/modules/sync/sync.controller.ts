@@ -1,11 +1,14 @@
 import { Controller, Post, Get, Body, Query, UseGuards, Req } from '@nestjs/common';
-import { SyncService } from './sync.service';
+import type { SyncService } from './sync.service';
+import { InjectSyncService } from './sync.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('sync')
 @UseGuards(JwtAuthGuard)
 export class SyncController {
-  constructor(private readonly syncService: SyncService) {}
+  constructor(
+    @InjectSyncService() private readonly syncService: SyncService,
+  ) {}
 
   @Get('pull')
   async pull(@Req() req: { user: { id: string } }, @Query('lastSyncedAt') lastSyncedAt?: string) {

@@ -12,7 +12,8 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { TransactionsService } from './transactions.service';
+import type { TransactionsService } from './transactions.service';
+import { InjectTransactionsService } from './transactions.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
@@ -23,7 +24,9 @@ import {
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
+  constructor(
+    @InjectTransactionsService() private readonly transactionsService: TransactionsService,
+  ) {}
 
   @Get()
   async findAll(

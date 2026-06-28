@@ -4,13 +4,16 @@ import {
   UploadedFile, UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { StatementsService } from './statements.service';
+import type { StatementsService } from './statements.service';
+import { InjectStatementsService } from './statements.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('statements')
 @UseGuards(JwtAuthGuard)
 export class StatementsController {
-  constructor(private readonly statementsService: StatementsService) {}
+  constructor(
+    @InjectStatementsService() private readonly statementsService: StatementsService,
+  ) {}
 
   @Get()
   async findAll(@Req() req: { user: { id: string } }) {

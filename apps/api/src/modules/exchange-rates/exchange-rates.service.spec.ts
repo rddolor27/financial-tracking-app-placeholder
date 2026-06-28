@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ExchangeRatesService } from './exchange-rates.service';
 import { ExchangeRate } from './exchange-rate.entity';
+import { EXCHANGE_RATES_SERVICE } from './exchange-rates.constants';
+import { ExchangeRatesProvider } from './exchange-rates.providers';
 
 const mockRepo = () => ({
   find: jest.fn(),
@@ -16,12 +18,12 @@ describe('ExchangeRatesService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ExchangeRatesService,
+        ExchangeRatesProvider,
         { provide: getRepositoryToken(ExchangeRate), useFactory: mockRepo },
       ],
     }).compile();
 
-    service = module.get<ExchangeRatesService>(ExchangeRatesService);
+    service = module.get<ExchangeRatesService>(EXCHANGE_RATES_SERVICE);
     repo = module.get(getRepositoryToken(ExchangeRate));
   });
 

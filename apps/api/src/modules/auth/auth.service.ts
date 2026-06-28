@@ -5,7 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { UsersService } from '../users/users.service';
+import type { UsersService } from '../users/users.service';
+import { InjectUsersService } from '../users/users.providers';
 import { RefreshToken } from './refresh-token.entity';
 import { User } from '../users/user.entity';
 
@@ -30,7 +31,7 @@ export interface AuthResult {
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    @InjectUsersService() private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     @InjectRepository(RefreshToken)

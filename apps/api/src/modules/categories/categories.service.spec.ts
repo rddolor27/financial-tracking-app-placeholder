@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { Category } from './category.entity';
+import { CATEGORIES_SERVICE } from './categories.constants';
+import { CategoriesProvider } from './categories.providers';
 
 const mockRepository = () => ({
   find: jest.fn(),
@@ -19,12 +21,12 @@ describe('CategoriesService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        CategoriesService,
+        CategoriesProvider,
         { provide: getRepositoryToken(Category), useFactory: mockRepository },
       ],
     }).compile();
 
-    service = module.get<CategoriesService>(CategoriesService);
+    service = module.get<CategoriesService>(CATEGORIES_SERVICE);
     repo = module.get(getRepositoryToken(Category));
   });
 

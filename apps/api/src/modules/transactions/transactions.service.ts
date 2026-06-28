@@ -2,14 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
-import { AccountsService } from '../accounts/accounts.service';
+import type { AccountsService } from '../accounts/accounts.service';
+import { InjectAccountsService } from '../accounts/accounts.providers';
 
 @Injectable()
 export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private readonly txRepo: Repository<Transaction>,
-    private readonly accountsService: AccountsService,
+    @InjectAccountsService() private readonly accountsService: AccountsService,
   ) {}
 
   async findAllByUser(

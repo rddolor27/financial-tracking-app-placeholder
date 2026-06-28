@@ -2,7 +2,8 @@ import {
   Controller, Get, Post, Patch, Delete, Body, Param,
   UseGuards, Req, HttpCode, HttpStatus,
 } from '@nestjs/common';
-import { BillRemindersService } from './bill-reminders.service';
+import type { BillRemindersService } from './bill-reminders.service';
+import { InjectBillRemindersService } from './bill-reminders.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
@@ -12,7 +13,9 @@ import {
 @Controller('bill-reminders')
 @UseGuards(JwtAuthGuard)
 export class BillRemindersController {
-  constructor(private readonly billRemindersService: BillRemindersService) {}
+  constructor(
+    @InjectBillRemindersService() private readonly billRemindersService: BillRemindersService,
+  ) {}
 
   @Get()
   async findAll(@Req() req: { user: { id: string } }) {
