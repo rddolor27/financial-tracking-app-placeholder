@@ -14,15 +14,9 @@ import {
 import type { InvestmentsService } from './investments.service';
 import { InjectInvestmentsService } from './investments.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import {
-  type CreateInvestmentDto,
-  CreateInvestmentSchema,
-  type UpdateInvestmentDto,
-  UpdateInvestmentSchema,
-  type CreateInvestmentTransactionDto,
-  CreateInvestmentTransactionSchema,
-} from './dtos';
+import { CreateInvestmentDto } from './dtos/create-investment.dto';
+import { UpdateInvestmentDto } from './dtos/update-investment.dto';
+import { CreateInvestmentTransactionDto } from './dtos/create-investment-transaction.dto';
 
 @Controller('investments')
 @UseGuards(JwtAuthGuard)
@@ -44,7 +38,7 @@ export class InvestmentsController {
   @Post()
   async create(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateInvestmentSchema)) body: CreateInvestmentDto,
+    @Body() body: CreateInvestmentDto,
   ) {
     return this.investmentsService.create(req.user.id, body);
   }
@@ -53,7 +47,7 @@ export class InvestmentsController {
   async update(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateInvestmentSchema)) body: UpdateInvestmentDto,
+    @Body() body: UpdateInvestmentDto,
   ) {
     return this.investmentsService.update(id, req.user.id, body);
   }
@@ -73,7 +67,7 @@ export class InvestmentsController {
   async createTransaction(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateInvestmentTransactionSchema)) body: CreateInvestmentTransactionDto,
+    @Body() body: CreateInvestmentTransactionDto,
   ) {
     return this.investmentsService.createTransaction(req.user.id, {
       ...body,

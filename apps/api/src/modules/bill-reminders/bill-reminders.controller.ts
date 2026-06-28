@@ -5,13 +5,8 @@ import {
 import type { BillRemindersService } from './bill-reminders.service';
 import { InjectBillRemindersService } from './bill-reminders.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import {
-  type CreateBillReminderDto,
-  CreateBillReminderSchema,
-  type UpdateBillReminderDto,
-  UpdateBillReminderSchema,
-} from './dtos';
+import { CreateBillReminderDto } from './dtos/create-bill-reminder.dto';
+import { UpdateBillReminderDto } from './dtos/update-bill-reminder.dto';
 
 @Controller('bill-reminders')
 @UseGuards(JwtAuthGuard)
@@ -33,7 +28,7 @@ export class BillRemindersController {
   @Post()
   async create(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateBillReminderSchema)) body: CreateBillReminderDto,
+    @Body() body: CreateBillReminderDto,
   ) {
     return this.billRemindersService.create(req.user.id, body);
   }
@@ -42,7 +37,7 @@ export class BillRemindersController {
   async update(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateBillReminderSchema)) body: UpdateBillReminderDto,
+    @Body() body: UpdateBillReminderDto,
   ) {
     return this.billRemindersService.update(id, req.user.id, body);
   }

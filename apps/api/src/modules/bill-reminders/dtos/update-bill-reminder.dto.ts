@@ -1,5 +1,4 @@
-import { UpdateBillReminderSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateBillReminderDto } from './create-bill-reminder.dto';
 
-export type UpdateBillReminderDto = z.infer<typeof UpdateBillReminderSchema>;
-export { UpdateBillReminderSchema };
+export class UpdateBillReminderDto extends PartialType(CreateBillReminderDto) {}

@@ -2,7 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BillReminder } from './bill-reminder.entity';
-import type { CreateBillReminderDto, UpdateBillReminderDto } from './dtos';
+import { CreateBillReminderDto } from './dtos/create-bill-reminder.dto';
+import { UpdateBillReminderDto } from './dtos/update-bill-reminder.dto';
 
 @Injectable()
 export class BillRemindersService {

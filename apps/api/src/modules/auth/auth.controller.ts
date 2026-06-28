@@ -11,15 +11,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import type { AuthService } from './auth.service';
 import { InjectAuthService } from './auth.providers';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import {
-  type CreateUserDto,
-  CreateUserSchema,
-  type LoginDto,
-  LoginSchema,
-  type RefreshTokenDto,
-  RefreshTokenRequestSchema,
-} from './dtos';
+import { RegisterDto } from './dtos/register.dto';
+import { LoginDto } from './dtos/login.dto';
+import { RefreshTokenDto } from './dtos/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -29,8 +23,8 @@ export class AuthController {
 
   @Post('register')
   async register(
-    @Body(new ZodValidationPipe(CreateUserSchema))
-    body: CreateUserDto,
+    @Body()
+    body: RegisterDto,
   ) {
     return this.authService.register(body);
   }
@@ -38,7 +32,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
-    @Body(new ZodValidationPipe(LoginSchema))
+    @Body()
     body: LoginDto,
   ) {
     return this.authService.login(body);
@@ -47,7 +41,7 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(
-    @Body(new ZodValidationPipe(RefreshTokenRequestSchema))
+    @Body()
     body: RefreshTokenDto,
   ) {
     return this.authService.refreshTokens(body.refresh_token);

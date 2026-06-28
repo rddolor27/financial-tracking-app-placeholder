@@ -2,7 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Goal } from './goal.entity';
-import type { CreateGoalDto, UpdateGoalDto } from './dtos';
+import { CreateGoalDto } from './dtos/create-goal.dto';
+import { UpdateGoalDto } from './dtos/update-goal.dto';
 
 @Injectable()
 export class GoalsService {

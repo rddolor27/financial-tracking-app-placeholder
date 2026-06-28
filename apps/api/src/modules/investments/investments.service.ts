@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Investment } from './investment.entity';
 import { InvestmentTransaction } from './investment-transaction.entity';
-import type { CreateInvestmentDto, UpdateInvestmentDto, CreateInvestmentTransactionDto } from './dtos';
+import { CreateInvestmentDto } from './dtos/create-investment.dto';
+import { UpdateInvestmentDto } from './dtos/update-investment.dto';
+import { CreateInvestmentTransactionDto } from './dtos/create-investment-transaction.dto';
 
 @Injectable()
 export class InvestmentsService {

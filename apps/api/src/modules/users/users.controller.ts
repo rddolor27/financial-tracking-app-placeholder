@@ -10,8 +10,8 @@ import {
 import type { UsersService } from './users.service';
 import { InjectUsersService } from './users.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import { type UpdateUserDto, UpdateUserSchema } from './dtos';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -34,7 +34,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateProfile(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateUserSchema))
+    @Body()
     body: UpdateUserDto,
   ) {
     const user = await this.usersService.update(req.user.id, body);
@@ -46,7 +46,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async changePassword(
     @Req() req: { user: { id: string } },
-    @Body() body: { current_password: string; new_password: string },
+    @Body() body: ChangePasswordDto,
   ) {
     await this.usersService.changePassword(req.user.id, body.current_password, body.new_password);
     return { message: 'Password changed successfully' };

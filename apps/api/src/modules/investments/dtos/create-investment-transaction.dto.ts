@@ -1,5 +1,35 @@
-import { CreateInvestmentTransactionSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsDateString,
+  IsPositive,
+} from 'class-validator';
 
-export type CreateInvestmentTransactionDto = z.infer<typeof CreateInvestmentTransactionSchema>;
-export { CreateInvestmentTransactionSchema };
+export class CreateInvestmentTransactionDto {
+  @IsEnum(['buy', 'sell', 'dividend'])
+  @IsNotEmpty()
+  type: 'buy' | 'sell' | 'dividend';
+
+  @IsNumber()
+  @IsPositive()
+  quantity: number;
+
+  @IsNumber()
+  @IsPositive()
+  price_per_unit: number;
+
+  @IsNumber()
+  @IsOptional()
+  fees?: number;
+
+  @IsDateString()
+  @IsNotEmpty()
+  date: string;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}

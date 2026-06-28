@@ -1,5 +1,16 @@
-import { UploadStatementSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsUUID,
+} from 'class-validator';
 
-export type UploadStatementDto = z.infer<typeof UploadStatementSchema>;
-export { UploadStatementSchema };
+export class UploadStatementDto {
+  @IsUUID()
+  @IsOptional()
+  account_id?: string;
+
+  @IsEnum(['bank', 'credit_card', 'investment', 'other'])
+  @IsNotEmpty()
+  statement_type: 'bank' | 'credit_card' | 'investment' | 'other';
+}

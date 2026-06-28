@@ -1,5 +1,4 @@
-import { UpdateCategorySchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateCategoryDto } from './create-category.dto';
 
-export type UpdateCategoryDto = z.infer<typeof UpdateCategorySchema>;
-export { UpdateCategorySchema };
+export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {}

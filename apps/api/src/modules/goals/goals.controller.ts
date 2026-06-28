@@ -5,15 +5,9 @@ import {
 import type { GoalsService } from './goals.service';
 import { InjectGoalsService } from './goals.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import {
-  type CreateGoalDto,
-  CreateGoalSchema,
-  type UpdateGoalDto,
-  UpdateGoalSchema,
-  type ContributeGoalDto,
-  ContributeGoalSchema,
-} from './dtos';
+import { CreateGoalDto } from './dtos/create-goal.dto';
+import { UpdateGoalDto } from './dtos/update-goal.dto';
+import { ContributeGoalDto } from './dtos/contribute-goal.dto';
 
 @Controller('goals')
 @UseGuards(JwtAuthGuard)
@@ -35,7 +29,7 @@ export class GoalsController {
   @Post()
   async create(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateGoalSchema)) body: CreateGoalDto,
+    @Body() body: CreateGoalDto,
   ) {
     return this.goalsService.create(req.user.id, body);
   }
@@ -44,7 +38,7 @@ export class GoalsController {
   async update(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateGoalSchema)) body: UpdateGoalDto,
+    @Body() body: UpdateGoalDto,
   ) {
     return this.goalsService.update(id, req.user.id, body);
   }
@@ -53,7 +47,7 @@ export class GoalsController {
   async contribute(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(ContributeGoalSchema)) body: ContributeGoalDto,
+    @Body() body: ContributeGoalDto,
   ) {
     return this.goalsService.contribute(id, req.user.id, body.amount);
   }

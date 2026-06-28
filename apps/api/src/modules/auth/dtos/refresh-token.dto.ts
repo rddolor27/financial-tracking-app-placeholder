@@ -1,5 +1,7 @@
-import { RefreshTokenRequestSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { IsString, IsNotEmpty } from 'class-validator';
 
-export type RefreshTokenDto = z.infer<typeof RefreshTokenRequestSchema>;
-export { RefreshTokenRequestSchema };
+export class RefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  refresh_token: string;
+}

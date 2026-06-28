@@ -9,18 +9,8 @@ import type { UsersService } from '../users/users.service';
 import { InjectUsersService } from '../users/users.providers';
 import { RefreshToken } from './refresh-token.entity';
 import { User } from '../users/user.entity';
-
-interface RegisterDto {
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-}
-
-interface LoginDto {
-  email: string;
-  password: string;
-}
+import { RegisterDto } from './dtos/register.dto';
+import { LoginDto } from './dtos/login.dto';
 
 export interface AuthResult {
   access_token: string;

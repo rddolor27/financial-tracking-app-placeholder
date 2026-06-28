@@ -1,5 +1,7 @@
-import { ContributeGoalSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { IsNumber, IsPositive } from 'class-validator';
 
-export type ContributeGoalDto = z.infer<typeof ContributeGoalSchema>;
-export { ContributeGoalSchema };
+export class ContributeGoalDto {
+  @IsNumber()
+  @IsPositive()
+  amount: number;
+}

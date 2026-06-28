@@ -1,5 +1,4 @@
-import { UpdateAccountSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateAccountDto } from './create-account.dto';
 
-export type UpdateAccountDto = z.infer<typeof UpdateAccountSchema>;
-export { UpdateAccountSchema };
+export class UpdateAccountDto extends PartialType(CreateAccountDto) {}

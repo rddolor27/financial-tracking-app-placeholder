@@ -2,6 +2,8 @@ import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import type { ImportService } from './import.service';
 import { InjectImportService } from './import.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CsvPreviewDto } from './dtos/csv-preview.dto';
+import { CsvConfirmDto } from './dtos/csv-confirm.dto';
 
 @Controller('import')
 @UseGuards(JwtAuthGuard)
@@ -13,7 +15,7 @@ export class ImportController {
   @Post('csv/preview')
   async preview(
     @Req() req: { user: { id: string } },
-    @Body() body: { account_id: string; csv_content: string },
+    @Body() body: CsvPreviewDto,
   ) {
     return this.importService.preview(req.user.id, body.account_id, body.csv_content);
   }
@@ -21,12 +23,8 @@ export class ImportController {
   @Post('csv/confirm')
   async confirm(
     @Req() req: { user: { id: string } },
-    @Body() body: {
-      account_id: string;
-      rows: Array<{ date: string; description: string; amount: string; type: string; category_id?: string }>;
-      default_category_id: string;
-    },
+    @Body() body: CsvConfirmDto,
   ) {
-    return this.importService.confirm(req.user.id, body.account_id, body.rows, body.default_category_id);
+    return this.importService.confirm(req.user.id, body.account_id, body.rows as any, body.default_category_id);
   }
 }

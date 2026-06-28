@@ -1,5 +1,15 @@
-import { UpdateInvestmentSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { IsString, IsNumber, IsOptional } from 'class-validator';
 
-export type UpdateInvestmentDto = z.infer<typeof UpdateInvestmentSchema>;
-export { UpdateInvestmentSchema };
+export class UpdateInvestmentDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsNumber()
+  @IsOptional()
+  quantity?: number;
+
+  @IsNumber()
+  @IsOptional()
+  avg_buy_price?: number;
+}

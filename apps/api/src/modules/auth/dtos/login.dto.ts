@@ -1,5 +1,11 @@
-import { LoginSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { IsString, IsNotEmpty, IsEmail } from 'class-validator';
 
-export type LoginDto = z.infer<typeof LoginSchema>;
-export { LoginSchema };
+export class LoginDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}

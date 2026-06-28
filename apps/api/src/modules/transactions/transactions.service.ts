@@ -4,7 +4,8 @@ import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import type { AccountsService } from '../accounts/accounts.service';
 import { InjectAccountsService } from '../accounts/accounts.providers';
-import type { CreateTransactionDto, UpdateTransactionDto } from './dtos';
+import { CreateTransactionDto } from './dtos/create-transaction.dto';
+import { UpdateTransactionDto } from './dtos/update-transaction.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -97,7 +98,7 @@ export class TransactionsService {
       userId,
     );
 
-    const tx = this.txRepo.create({ ...data, user_id: userId });
+    const tx = this.txRepo.create({ ...data, user_id: userId } as Partial<Transaction>);
     const saved = await this.txRepo.save(tx);
 
     // Update account balance

@@ -1,5 +1,20 @@
-import { UpdateUserSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { IsString, IsOptional, MaxLength } from 'class-validator';
 
-export type UpdateUserDto = z.infer<typeof UpdateUserSchema>;
-export { UpdateUserSchema };
+export class UpdateUserDto {
+  @IsString()
+  @IsOptional()
+  first_name?: string;
+
+  @IsString()
+  @IsOptional()
+  last_name?: string;
+
+  @IsString()
+  @IsOptional()
+  avatar_url?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(3)
+  currency?: string;
+}

@@ -14,13 +14,8 @@ import {
 import type { BudgetsService } from './budgets.service';
 import { InjectBudgetsService } from './budgets.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import {
-  type CreateBudgetDto,
-  CreateBudgetSchema,
-  type UpdateBudgetDto,
-  UpdateBudgetSchema,
-} from './dtos';
+import { CreateBudgetDto } from './dtos/create-budget.dto';
+import { UpdateBudgetDto } from './dtos/update-budget.dto';
 
 @Controller('budgets')
 @UseGuards(JwtAuthGuard)
@@ -45,7 +40,7 @@ export class BudgetsController {
   @Post()
   async create(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateBudgetSchema)) body: CreateBudgetDto,
+    @Body() body: CreateBudgetDto,
   ) {
     return this.budgetsService.create(req.user.id, body);
   }
@@ -54,7 +49,7 @@ export class BudgetsController {
   async update(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateBudgetSchema)) body: UpdateBudgetDto,
+    @Body() body: UpdateBudgetDto,
   ) {
     return this.budgetsService.update(id, req.user.id, body);
   }

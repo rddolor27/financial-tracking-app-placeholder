@@ -2,7 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Budget } from './budget.entity';
-import type { CreateBudgetDto, UpdateBudgetDto } from './dtos';
+import { CreateBudgetDto } from './dtos/create-budget.dto';
+import { UpdateBudgetDto } from './dtos/update-budget.dto';
 
 @Injectable()
 export class BudgetsService {

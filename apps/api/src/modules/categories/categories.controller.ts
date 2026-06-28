@@ -14,13 +14,8 @@ import {
 import type { CategoriesService } from './categories.service';
 import { InjectCategoriesService } from './categories.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import {
-  type CreateCategoryDto,
-  CreateCategorySchema,
-  type UpdateCategoryDto,
-  UpdateCategorySchema,
-} from './dtos';
+import { CreateCategoryDto } from './dtos/create-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
 
 @Controller('categories')
 @UseGuards(JwtAuthGuard)
@@ -45,7 +40,7 @@ export class CategoriesController {
   @Post()
   async create(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateCategorySchema)) body: CreateCategoryDto,
+    @Body() body: CreateCategoryDto,
   ) {
     return this.categoriesService.create(req.user.id, body);
   }
@@ -54,7 +49,7 @@ export class CategoriesController {
   async update(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateCategorySchema)) body: UpdateCategoryDto,
+    @Body() body: UpdateCategoryDto,
   ) {
     return this.categoriesService.update(id, req.user.id, body);
   }

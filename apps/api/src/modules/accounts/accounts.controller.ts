@@ -14,13 +14,8 @@ import {
 import type { AccountsService } from './accounts.service';
 import { InjectAccountsService } from './accounts.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import {
-  type CreateAccountDto,
-  CreateAccountSchema,
-  type UpdateAccountDto,
-  UpdateAccountSchema,
-} from './dtos';
+import { CreateAccountDto } from './dtos/create-account.dto';
+import { UpdateAccountDto } from './dtos/update-account.dto';
 
 @Controller('accounts')
 @UseGuards(JwtAuthGuard)
@@ -45,7 +40,7 @@ export class AccountsController {
   @Post()
   async create(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateAccountSchema)) body: CreateAccountDto,
+    @Body() body: CreateAccountDto,
   ) {
     return this.accountsService.create(req.user.id, body);
   }
@@ -54,7 +49,7 @@ export class AccountsController {
   async update(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateAccountSchema)) body: UpdateAccountDto,
+    @Body() body: UpdateAccountDto,
   ) {
     return this.accountsService.update(id, req.user.id, body);
   }

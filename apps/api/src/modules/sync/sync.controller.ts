@@ -2,6 +2,7 @@ import { Controller, Post, Get, Body, Query, UseGuards, Req } from '@nestjs/comm
 import type { SyncService } from './sync.service';
 import { InjectSyncService } from './sync.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { SyncPushDto } from './dtos/sync-push.dto';
 
 @Controller('sync')
 @UseGuards(JwtAuthGuard)
@@ -18,8 +19,8 @@ export class SyncController {
   @Post('push')
   async push(
     @Req() req: { user: { id: string } },
-    @Body() body: { changes: Array<{ entity_type: string; action: 'create' | 'update' | 'delete'; entity_id?: string; data?: Record<string, unknown> }> },
+    @Body() body: SyncPushDto,
   ) {
-    return this.syncService.push(req.user.id, body.changes);
+    return this.syncService.push(req.user.id, body.changes as any);
   }
 }

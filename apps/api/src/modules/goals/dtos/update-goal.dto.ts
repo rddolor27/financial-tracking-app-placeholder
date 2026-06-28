@@ -1,5 +1,4 @@
-import { UpdateGoalSchema } from '@financial-tracker/shared-types';
-import type { z } from 'zod';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateGoalDto } from './create-goal.dto';
 
-export type UpdateGoalDto = z.infer<typeof UpdateGoalSchema>;
-export { UpdateGoalSchema };
+export class UpdateGoalDto extends PartialType(CreateGoalDto) {}
