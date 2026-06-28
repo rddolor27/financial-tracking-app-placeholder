@@ -1,6 +1,8 @@
 import dataSource from '../data-source';
 import { seedCategories } from './category.seed';
 import { seedSubscriptionPlans } from './subscription-plan.seed';
+import { seedUsers } from './user.seed';
+import { seedDemoData } from './demo-data.seed';
 
 async function runSeeds() {
   try {
@@ -9,6 +11,8 @@ async function runSeeds() {
 
     await seedCategories(dataSource);
     await seedSubscriptionPlans(dataSource);
+    await seedUsers(dataSource);
+    await seedDemoData(dataSource);
 
     console.log('All seeds completed');
     await dataSource.destroy();
