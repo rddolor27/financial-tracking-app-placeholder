@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import type { ExchangeRatesService } from './exchange-rates.service';
 import { InjectExchangeRatesService } from './exchange-rates.providers';
+import { ExchangeRateModel } from './models/exchange-rate.model';
 
 @Controller('exchange-rates')
 export class ExchangeRatesController {
@@ -9,7 +10,7 @@ export class ExchangeRatesController {
   ) {}
 
   @Get()
-  async getAll() {
+  async getAll(): Promise<ExchangeRateModel[]> {
     return this.exchangeRatesService.getAll();
   }
 

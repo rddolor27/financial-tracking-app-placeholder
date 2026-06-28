@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { SubscriptionPlan } from './subscription-plan.entity';
 import { Subscription } from './subscription.entity';
 import { Payment } from './payment.entity';
+import { SubscriptionModel } from './models/subscription.model';
+import { SubscriptionPlanModel } from './models/subscription-plan.model';
 
 @Injectable()
 export class SubscriptionsService {
@@ -13,11 +15,12 @@ export class SubscriptionsService {
     @InjectRepository(Payment) private readonly paymentsRepo: Repository<Payment>,
   ) {}
 
-  async getPlans(): Promise<SubscriptionPlan[]> {
-    return this.plansRepo.find({
+  async getPlans(): Promise<SubscriptionPlanModel[]> {
+    const plans = await this.plansRepo.find({
       where: { is_active: true },
       order: { sort_order: 'ASC' },
     });
+    return plans.map((entity) => SubscriptionPlanModel.fromEntity(entity));
   }
 
   async getPlanById(planId: string): Promise<SubscriptionPlan> {
@@ -26,15 +29,19 @@ export class SubscriptionsService {
     return plan;
   }
 
-  async getUserSubscription(userId: string): Promise<Subscription | null> {
-    return this.subscriptionsRepo.findOne({
+  async getUserSubscription(userId: string): Promise<SubscriptionModel | null> {
+    const subscription = await this.subscriptionsRepo.findOne({
       where: { user_id: userId, status: 'active' },
       relations: ['plan'],
     });
+    return subscription ? SubscriptionModel.fromEntity(subscription) : null;
   }
 
   async getUserFeatures(userId: string): Promise<Record<string, boolean>> {
-    const subscription = await this.getUserSubscription(userId);
+    const subscription = await this.subscriptionsRepo.findOne({
+      where: { user_id: userId, status: 'active' },
+      relations: ['plan'],
+    });
     if (!subscription || !subscription.plan) {
       // Free tier defaults
       return {
@@ -64,9 +71,11 @@ export class SubscriptionsService {
     userId: string,
     planId: string,
     platform: 'web' | 'mobile',
-  ): Promise<Subscription> {
-    const existing = await this.getUserSubscription(userId);
-    if (existing) {
+  ): Promise<SubscriptionModel> {
+    const existingSub = await this.subscriptionsRepo.findOne({
+      where: { user_id: userId, status: 'active' },
+    });
+    if (existingSub) {
       throw new BadRequestException('User already has an active subscription');
     }
 
@@ -81,18 +90,22 @@ export class SubscriptionsService {
       current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
     });
 
-    return this.subscriptionsRepo.save(subscription) as Promise<Subscription>;
+    const saved = await this.subscriptionsRepo.save(subscription) as Subscription;
+    return SubscriptionModel.fromEntity(saved);
   }
 
-  async cancelSubscription(userId: string): Promise<Subscription> {
-    const subscription = await this.getUserSubscription(userId);
+  async cancelSubscription(userId: string): Promise<SubscriptionModel> {
+    const subscription = await this.subscriptionsRepo.findOne({
+      where: { user_id: userId, status: 'active' },
+    });
     if (!subscription) {
       throw new NotFoundException('No active subscription found');
     }
 
     subscription.status = 'cancelled';
     subscription.cancelled_at = new Date();
-    return this.subscriptionsRepo.save(subscription);
+    const saved = await this.subscriptionsRepo.save(subscription);
+    return SubscriptionModel.fromEntity(saved);
   }
 
   async recordPayment(data: {

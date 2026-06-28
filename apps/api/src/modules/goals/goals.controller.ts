@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateGoalDto } from './dtos/create-goal.dto';
 import { UpdateGoalDto } from './dtos/update-goal.dto';
 import { ContributeGoalDto } from './dtos/contribute-goal.dto';
+import { GoalModel } from './models/goal.model';
 
 @Controller('goals')
 @UseGuards(JwtAuthGuard)
@@ -17,12 +18,12 @@ export class GoalsController {
   ) {}
 
   @Get()
-  async findAll(@Req() req: { user: { id: string } }) {
+  async findAll(@Req() req: { user: { id: string } }): Promise<GoalModel[]> {
     return this.goalsService.findAllByUser(req.user.id);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Req() req: { user: { id: string } }) {
+  async findOne(@Param('id') id: string, @Req() req: { user: { id: string } }): Promise<GoalModel> {
     return this.goalsService.findOneByUser(id, req.user.id);
   }
 
@@ -30,7 +31,7 @@ export class GoalsController {
   async create(
     @Req() req: { user: { id: string } },
     @Body() body: CreateGoalDto,
-  ) {
+  ): Promise<GoalModel> {
     return this.goalsService.create(req.user.id, body);
   }
 
@@ -39,7 +40,7 @@ export class GoalsController {
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
     @Body() body: UpdateGoalDto,
-  ) {
+  ): Promise<GoalModel> {
     return this.goalsService.update(id, req.user.id, body);
   }
 
@@ -48,13 +49,13 @@ export class GoalsController {
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
     @Body() body: ContributeGoalDto,
-  ) {
+  ): Promise<GoalModel> {
     return this.goalsService.contribute(id, req.user.id, body.amount);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string, @Req() req: { user: { id: string } }) {
+  async remove(@Param('id') id: string, @Req() req: { user: { id: string } }): Promise<void> {
     await this.goalsService.remove(id, req.user.id);
   }
 }

@@ -16,6 +16,7 @@ import { InjectAccountsService } from './accounts.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateAccountDto } from './dtos/create-account.dto';
 import { UpdateAccountDto } from './dtos/update-account.dto';
+import { AccountModel } from './models/account.model';
 
 @Controller('accounts')
 @UseGuards(JwtAuthGuard)
@@ -25,7 +26,7 @@ export class AccountsController {
   ) {}
 
   @Get()
-  async findAll(@Req() req: { user: { id: string } }) {
+  async findAll(@Req() req: { user: { id: string } }): Promise<AccountModel[]> {
     return this.accountsService.findAllByUser(req.user.id);
   }
 
@@ -33,7 +34,7 @@ export class AccountsController {
   async findOne(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-  ) {
+  ): Promise<AccountModel> {
     return this.accountsService.findOneByUser(id, req.user.id);
   }
 
@@ -41,7 +42,7 @@ export class AccountsController {
   async create(
     @Req() req: { user: { id: string } },
     @Body() body: CreateAccountDto,
-  ) {
+  ): Promise<AccountModel> {
     return this.accountsService.create(req.user.id, body);
   }
 
@@ -50,7 +51,7 @@ export class AccountsController {
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
     @Body() body: UpdateAccountDto,
-  ) {
+  ): Promise<AccountModel> {
     return this.accountsService.update(id, req.user.id, body);
   }
 
@@ -59,7 +60,7 @@ export class AccountsController {
   async remove(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-  ) {
+  ): Promise<void> {
     await this.accountsService.remove(id, req.user.id);
   }
 }

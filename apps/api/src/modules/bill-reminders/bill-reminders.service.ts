@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { BillReminder } from './bill-reminder.entity';
 import { CreateBillReminderDto } from './dtos/create-bill-reminder.dto';
 import { UpdateBillReminderDto } from './dtos/update-bill-reminder.dto';
+import { BillReminderModel } from './models/bill-reminder.model';
 
 @Injectable()
 export class BillRemindersService {
@@ -12,32 +13,40 @@ export class BillRemindersService {
     private readonly billRemindersRepo: Repository<BillReminder>,
   ) {}
 
-  async findAllByUser(userId: string): Promise<BillReminder[]> {
-    return this.billRemindersRepo.find({
-      where: { user_id: userId },
-      order: { due_day: 'ASC' },
-    });
-  }
-
-  async findOneByUser(id: string, userId: string): Promise<BillReminder> {
+  private async findEntityByUser(id: string, userId: string): Promise<BillReminder> {
     const reminder = await this.billRemindersRepo.findOne({ where: { id, user_id: userId } });
     if (!reminder) throw new NotFoundException('Bill reminder not found');
     return reminder;
   }
 
-  async create(userId: string, data: CreateBillReminderDto): Promise<BillReminder> {
-    const reminder = this.billRemindersRepo.create({ ...data, user_id: userId });
-    return this.billRemindersRepo.save(reminder);
+  async findAllByUser(userId: string): Promise<BillReminderModel[]> {
+    const reminders = await this.billRemindersRepo.find({
+      where: { user_id: userId },
+      order: { due_day: 'ASC' },
+    });
+    return reminders.map((entity) => BillReminderModel.fromEntity(entity));
   }
 
-  async update(id: string, userId: string, data: UpdateBillReminderDto): Promise<BillReminder> {
-    const reminder = await this.findOneByUser(id, userId);
+  async findOneByUser(id: string, userId: string): Promise<BillReminderModel> {
+    const reminder = await this.findEntityByUser(id, userId);
+    return BillReminderModel.fromEntity(reminder);
+  }
+
+  async create(userId: string, data: CreateBillReminderDto): Promise<BillReminderModel> {
+    const reminder = this.billRemindersRepo.create({ ...data, user_id: userId });
+    const saved = await this.billRemindersRepo.save(reminder);
+    return BillReminderModel.fromEntity(saved);
+  }
+
+  async update(id: string, userId: string, data: UpdateBillReminderDto): Promise<BillReminderModel> {
+    const reminder = await this.findEntityByUser(id, userId);
     this.billRemindersRepo.merge(reminder, data);
-    return this.billRemindersRepo.save(reminder);
+    const saved = await this.billRemindersRepo.save(reminder);
+    return BillReminderModel.fromEntity(saved);
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const reminder = await this.findOneByUser(id, userId);
+    const reminder = await this.findEntityByUser(id, userId);
     await this.billRemindersRepo.remove(reminder);
   }
 }

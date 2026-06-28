@@ -16,6 +16,7 @@ import { InjectCategoriesService } from './categories.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { CategoryModel } from './models/category.model';
 
 @Controller('categories')
 @UseGuards(JwtAuthGuard)
@@ -25,7 +26,7 @@ export class CategoriesController {
   ) {}
 
   @Get()
-  async findAll(@Req() req: { user: { id: string } }) {
+  async findAll(@Req() req: { user: { id: string } }): Promise<CategoryModel[]> {
     return this.categoriesService.findAllForUser(req.user.id);
   }
 
@@ -33,7 +34,7 @@ export class CategoriesController {
   async findOne(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-  ) {
+  ): Promise<CategoryModel> {
     return this.categoriesService.findOneForUser(id, req.user.id);
   }
 
@@ -41,7 +42,7 @@ export class CategoriesController {
   async create(
     @Req() req: { user: { id: string } },
     @Body() body: CreateCategoryDto,
-  ) {
+  ): Promise<CategoryModel> {
     return this.categoriesService.create(req.user.id, body);
   }
 
@@ -50,7 +51,7 @@ export class CategoriesController {
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
     @Body() body: UpdateCategoryDto,
-  ) {
+  ): Promise<CategoryModel> {
     return this.categoriesService.update(id, req.user.id, body);
   }
 
@@ -59,7 +60,7 @@ export class CategoriesController {
   async remove(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-  ) {
+  ): Promise<void> {
     await this.categoriesService.remove(id, req.user.id);
   }
 }

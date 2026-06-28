@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ExchangeRate } from './exchange-rate.entity';
+import { ExchangeRateModel } from './models/exchange-rate.model';
 
 @Injectable()
 export class ExchangeRatesService {
@@ -12,24 +13,30 @@ export class ExchangeRatesService {
     @InjectRepository(ExchangeRate) private readonly ratesRepo: Repository<ExchangeRate>,
   ) {}
 
-  async getAll(): Promise<ExchangeRate[]> {
-    return this.ratesRepo.find();
+  async getAll(): Promise<ExchangeRateModel[]> {
+    const rates = await this.ratesRepo.find();
+    return rates.map((entity) => ExchangeRateModel.fromEntity(entity));
   }
 
-  async getRate(baseCurrency: string, targetCurrency: string): Promise<number | null> {
-    if (baseCurrency === targetCurrency) return 1;
+  async getRate(baseCurrency: string, targetCurrency: string): Promise<ExchangeRateModel | null> {
+    if (baseCurrency === targetCurrency) return null;
 
     const rate = await this.ratesRepo.findOne({
       where: { base_currency: baseCurrency, target_currency: targetCurrency },
     });
 
-    return rate ? Number(rate.rate) : null;
+    return rate ? ExchangeRateModel.fromEntity(rate) : null;
   }
 
   async convert(amount: number, fromCurrency: string, toCurrency: string): Promise<number | null> {
-    const rate = await this.getRate(fromCurrency, toCurrency);
-    if (rate === null) return null;
-    return Math.round(amount * rate * 100) / 100;
+    if (fromCurrency === toCurrency) return amount;
+
+    const rate = await this.ratesRepo.findOne({
+      where: { base_currency: fromCurrency, target_currency: toCurrency },
+    });
+
+    if (!rate) return null;
+    return Math.round(amount * Number(rate.rate) * 100) / 100;
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_6AM)

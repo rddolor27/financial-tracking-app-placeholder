@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { UserModel } from './models/user.model';
 
 @Injectable()
 export class UsersService {
@@ -37,13 +38,22 @@ export class UsersService {
     return this.usersRepo.save(user);
   }
 
-  async update(id: string, data: Partial<User>): Promise<User> {
+  async getProfile(userId: string): Promise<UserModel> {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return UserModel.fromEntity(user);
+  }
+
+  async update(id: string, data: Partial<User>): Promise<UserModel> {
     const user = await this.findById(id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     this.usersRepo.merge(user, data);
-    return this.usersRepo.save(user);
+    const saved = await this.usersRepo.save(user);
+    return UserModel.fromEntity(saved);
   }
 
   async changePassword(

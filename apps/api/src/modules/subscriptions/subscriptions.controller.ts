@@ -3,6 +3,8 @@ import type { SubscriptionsService } from './subscriptions.service';
 import { InjectSubscriptionsService } from './subscriptions.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CheckoutRequestDto } from './dtos/checkout-request.dto';
+import { SubscriptionModel } from './models/subscription.model';
+import { SubscriptionPlanModel } from './models/subscription-plan.model';
 
 @Controller('subscriptions')
 export class SubscriptionsController {
@@ -11,19 +13,19 @@ export class SubscriptionsController {
   ) {}
 
   @Get('plans')
-  async getPlans() {
+  async getPlans(): Promise<SubscriptionPlanModel[]> {
     return this.subscriptionsService.getPlans();
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getMySubscription(@Req() req: { user: { id: string } }) {
+  async getMySubscription(@Req() req: { user: { id: string } }): Promise<SubscriptionModel | null> {
     return this.subscriptionsService.getUserSubscription(req.user.id);
   }
 
   @Get('features')
   @UseGuards(JwtAuthGuard)
-  async getMyFeatures(@Req() req: { user: { id: string } }) {
+  async getMyFeatures(@Req() req: { user: { id: string } }): Promise<Record<string, boolean>> {
     return this.subscriptionsService.getUserFeatures(req.user.id);
   }
 
@@ -32,13 +34,13 @@ export class SubscriptionsController {
   async subscribe(
     @Req() req: { user: { id: string } },
     @Body() body: CheckoutRequestDto,
-  ) {
+  ): Promise<SubscriptionModel> {
     return this.subscriptionsService.createSubscription(req.user.id, body.plan_id, body.platform);
   }
 
   @Delete('cancel')
   @UseGuards(JwtAuthGuard)
-  async cancel(@Req() req: { user: { id: string } }) {
+  async cancel(@Req() req: { user: { id: string } }): Promise<SubscriptionModel> {
     return this.subscriptionsService.cancelSubscription(req.user.id);
   }
 

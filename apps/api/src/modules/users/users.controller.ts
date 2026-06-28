@@ -12,6 +12,7 @@ import { InjectUsersService } from './users.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { UserModel } from './models/user.model';
 
 @Controller('users')
 export class UsersController {
@@ -21,13 +22,8 @@ export class UsersController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@Req() req: { user: { id: string } }) {
-    const user = await this.usersService.findById(req.user.id);
-    if (!user) {
-      return null;
-    }
-    const { password_hash: _ph, google_id: _gid, ...profile } = user;
-    return profile;
+  async getProfile(@Req() req: { user: { id: string } }): Promise<UserModel> {
+    return this.usersService.getProfile(req.user.id);
   }
 
   @Patch('me')
@@ -36,10 +32,8 @@ export class UsersController {
     @Req() req: { user: { id: string } },
     @Body()
     body: UpdateUserDto,
-  ) {
-    const user = await this.usersService.update(req.user.id, body);
-    const { password_hash: _ph, google_id: _gid, ...profile } = user;
-    return profile;
+  ): Promise<UserModel> {
+    return this.usersService.update(req.user.id, body);
   }
 
   @Post('me/password')
@@ -47,7 +41,7 @@ export class UsersController {
   async changePassword(
     @Req() req: { user: { id: string } },
     @Body() body: ChangePasswordDto,
-  ) {
+  ): Promise<{ message: string }> {
     await this.usersService.changePassword(req.user.id, body.current_password, body.new_password);
     return { message: 'Password changed successfully' };
   }

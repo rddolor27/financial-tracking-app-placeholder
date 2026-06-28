@@ -6,6 +6,7 @@ import type { AccountsService } from '../accounts/accounts.service';
 import { InjectAccountsService } from '../accounts/accounts.providers';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { UpdateTransactionDto } from './dtos/update-transaction.dto';
+import { TransactionModel } from './models/transaction.model';
 
 @Injectable()
 export class TransactionsService {
@@ -14,6 +15,16 @@ export class TransactionsService {
     private readonly txRepo: Repository<Transaction>,
     @InjectAccountsService() private readonly accountsService: AccountsService,
   ) {}
+
+  private async findEntityByUser(id: string, userId: string): Promise<Transaction> {
+    const tx = await this.txRepo.findOne({
+      where: { id, user_id: userId },
+    });
+    if (!tx) {
+      throw new NotFoundException('Transaction not found');
+    }
+    return tx;
+  }
 
   async findAllByUser(
     userId: string,
@@ -71,7 +82,7 @@ export class TransactionsService {
     const data = hasNextPage ? results.slice(0, limit) : results;
 
     return {
-      data,
+      data: data.map((tx) => TransactionModel.fromEntity(tx)),
       meta: {
         hasNextPage,
         nextCursor: hasNextPage ? data[data.length - 1]?.id : null,
@@ -79,20 +90,15 @@ export class TransactionsService {
     };
   }
 
-  async findOneByUser(id: string, userId: string): Promise<Transaction> {
-    const tx = await this.txRepo.findOne({
-      where: { id, user_id: userId },
-    });
-    if (!tx) {
-      throw new NotFoundException('Transaction not found');
-    }
-    return tx;
+  async findOneByUser(id: string, userId: string): Promise<TransactionModel> {
+    const tx = await this.findEntityByUser(id, userId);
+    return TransactionModel.fromEntity(tx);
   }
 
   async create(
     userId: string,
     data: CreateTransactionDto,
-  ): Promise<Transaction> {
+  ): Promise<TransactionModel> {
     const account = await this.accountsService.findOneByUser(
       data.account_id!,
       userId,
@@ -104,42 +110,41 @@ export class TransactionsService {
     // Update account balance
     const balanceChange =
       data.type === 'income' ? Number(data.amount) : -Number(data.amount);
-    await this.accountsService.update(account.id, userId, {
+    await this.accountsService.update(account.id!, userId, {
       balance: Number(account.balance) + balanceChange,
     });
 
     // Handle transfer
     if (data.type === 'transfer' && data.transfer_to_account_id) {
+      const toAccount = await this.accountsService.findOneByUser(
+        data.transfer_to_account_id,
+        userId,
+      );
       await this.accountsService.update(
         data.transfer_to_account_id,
         userId,
         {
-          balance:
-            (
-              await this.accountsService.findOneByUser(
-                data.transfer_to_account_id,
-                userId,
-              )
-            ).balance + Number(data.amount),
+          balance: Number(toAccount.balance) + Number(data.amount),
         },
       );
     }
 
-    return saved;
+    return TransactionModel.fromEntity(saved);
   }
 
   async update(
     id: string,
     userId: string,
     data: UpdateTransactionDto,
-  ): Promise<Transaction> {
-    const tx = await this.findOneByUser(id, userId);
+  ): Promise<TransactionModel> {
+    const tx = await this.findEntityByUser(id, userId);
     this.txRepo.merge(tx, data as Partial<Transaction>);
-    return this.txRepo.save(tx);
+    const saved = await this.txRepo.save(tx);
+    return TransactionModel.fromEntity(saved);
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const tx = await this.findOneByUser(id, userId);
+    const tx = await this.findEntityByUser(id, userId);
     const account = await this.accountsService.findOneByUser(
       tx.account_id,
       userId,
@@ -148,7 +153,7 @@ export class TransactionsService {
     // Reverse the balance change
     const reversal =
       tx.type === 'income' ? -Number(tx.amount) : Number(tx.amount);
-    await this.accountsService.update(account.id, userId, {
+    await this.accountsService.update(account.id!, userId, {
       balance: Number(account.balance) + reversal,
     });
 

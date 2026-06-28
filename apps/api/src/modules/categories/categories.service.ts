@@ -8,6 +8,7 @@ import { Repository, IsNull } from 'typeorm';
 import { Category } from './category.entity';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { CategoryModel } from './models/category.model';
 
 @Injectable()
 export class CategoriesService {
@@ -16,14 +17,7 @@ export class CategoriesService {
     private readonly categoriesRepo: Repository<Category>,
   ) {}
 
-  async findAllForUser(userId: string): Promise<Category[]> {
-    return this.categoriesRepo.find({
-      where: [{ user_id: userId }, { user_id: IsNull() }],
-      order: { is_default: 'DESC', name: 'ASC' },
-    });
-  }
-
-  async findOneForUser(id: string, userId: string): Promise<Category> {
+  private async findEntityForUser(id: string, userId: string): Promise<Category> {
     const category = await this.categoriesRepo.findOne({
       where: [
         { id, user_id: userId },
@@ -36,24 +30,37 @@ export class CategoriesService {
     return category;
   }
 
-  async create(userId: string, data: CreateCategoryDto): Promise<Category> {
+  async findAllForUser(userId: string): Promise<CategoryModel[]> {
+    const categories = await this.categoriesRepo.find({
+      where: [{ user_id: userId }, { user_id: IsNull() }],
+      order: { is_default: 'DESC', name: 'ASC' },
+    });
+    return categories.map((category) => CategoryModel.fromEntity(category));
+  }
+
+  async findOneForUser(id: string, userId: string): Promise<CategoryModel> {
+    const category = await this.findEntityForUser(id, userId);
+    return CategoryModel.fromEntity(category);
+  }
+
+  async create(userId: string, data: CreateCategoryDto): Promise<CategoryModel> {
     const category = this.categoriesRepo.create({
       ...data,
       user_id: userId,
       is_default: false,
     });
-    return this.categoriesRepo.save(category);
+    const saved = await this.categoriesRepo.save(category);
+    return CategoryModel.fromEntity(saved);
   }
 
   async update(
     id: string,
     userId: string,
     data: UpdateCategoryDto | Partial<Category>,
-  ): Promise<Category> {
-    const category = await this.findOneForUser(id, userId);
+  ): Promise<CategoryModel> {
+    const category = await this.findEntityForUser(id, userId);
 
     if (category.is_default && category.user_id === null) {
-      // Default categories can only be hidden, not renamed/recolored
       const allowedKeys = ['is_hidden'];
       const attemptedKeys = Object.keys(data);
       const disallowed = attemptedKeys.filter(
@@ -67,11 +74,12 @@ export class CategoriesService {
     }
 
     this.categoriesRepo.merge(category, data);
-    return this.categoriesRepo.save(category);
+    const saved = await this.categoriesRepo.save(category);
+    return CategoryModel.fromEntity(saved);
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const category = await this.findOneForUser(id, userId);
+    const category = await this.findEntityForUser(id, userId);
 
     if (category.is_default) {
       throw new ForbiddenException(

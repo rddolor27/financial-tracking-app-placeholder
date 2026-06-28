@@ -17,6 +17,7 @@ import { InjectTransactionsService } from './transactions.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { UpdateTransactionDto } from './dtos/update-transaction.dto';
+import { TransactionModel } from './models/transaction.model';
 
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
@@ -53,7 +54,7 @@ export class TransactionsController {
   async findOne(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-  ) {
+  ): Promise<TransactionModel> {
     return this.transactionsService.findOneByUser(id, req.user.id);
   }
 
@@ -62,7 +63,7 @@ export class TransactionsController {
     @Req() req: { user: { id: string } },
     @Body()
     body: CreateTransactionDto,
-  ) {
+  ): Promise<TransactionModel> {
     return this.transactionsService.create(req.user.id, body);
   }
 
@@ -72,7 +73,7 @@ export class TransactionsController {
     @Req() req: { user: { id: string } },
     @Body()
     body: UpdateTransactionDto,
-  ) {
+  ): Promise<TransactionModel> {
     return this.transactionsService.update(id, req.user.id, body);
   }
 
@@ -81,7 +82,7 @@ export class TransactionsController {
   async remove(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-  ) {
+  ): Promise<void> {
     await this.transactionsService.remove(id, req.user.id);
   }
 }

@@ -118,11 +118,12 @@ export class AuthService {
       // Check if email exists (link accounts)
       user = await this.usersService.findByEmail(profile.email);
       if (user) {
-        user = await this.usersService.update(user.id, {
+        await this.usersService.update(user.id, {
           google_id: profile.google_id,
           auth_provider: 'both',
           avatar_url: profile.avatar_url || user.avatar_url,
         });
+        user = (await this.usersService.findById(user.id)) as User;
       } else {
         user = await this.usersService.create({
           email: profile.email,
@@ -135,7 +136,7 @@ export class AuthService {
       }
     }
 
-    return this.generateTokens(user);
+    return this.generateTokens(user!);
   }
 
   private async generateTokens(user: User): Promise<AuthResult> {

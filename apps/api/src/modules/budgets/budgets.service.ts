@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Budget } from './budget.entity';
 import { CreateBudgetDto } from './dtos/create-budget.dto';
 import { UpdateBudgetDto } from './dtos/update-budget.dto';
+import { BudgetModel } from './models/budget.model';
 
 @Injectable()
 export class BudgetsService {
@@ -12,14 +13,7 @@ export class BudgetsService {
     private readonly budgetsRepo: Repository<Budget>,
   ) {}
 
-  async findAllByUser(userId: string): Promise<Budget[]> {
-    return this.budgetsRepo.find({
-      where: { user_id: userId },
-      order: { created_at: 'DESC' },
-    });
-  }
-
-  async findOneByUser(id: string, userId: string): Promise<Budget> {
+  private async findEntityByUser(id: string, userId: string): Promise<Budget> {
     const budget = await this.budgetsRepo.findOne({
       where: { id, user_id: userId },
     });
@@ -29,23 +23,38 @@ export class BudgetsService {
     return budget;
   }
 
-  async create(userId: string, data: CreateBudgetDto): Promise<Budget> {
+  async findAllByUser(userId: string): Promise<BudgetModel[]> {
+    const budgets = await this.budgetsRepo.find({
+      where: { user_id: userId },
+      order: { created_at: 'DESC' },
+    });
+    return budgets.map((entity) => BudgetModel.fromEntity(entity));
+  }
+
+  async findOneByUser(id: string, userId: string): Promise<BudgetModel> {
+    const budget = await this.findEntityByUser(id, userId);
+    return BudgetModel.fromEntity(budget);
+  }
+
+  async create(userId: string, data: CreateBudgetDto): Promise<BudgetModel> {
     const budget = this.budgetsRepo.create({ ...data, user_id: userId });
-    return this.budgetsRepo.save(budget);
+    const saved = await this.budgetsRepo.save(budget);
+    return BudgetModel.fromEntity(saved);
   }
 
   async update(
     id: string,
     userId: string,
     data: UpdateBudgetDto,
-  ): Promise<Budget> {
-    const budget = await this.findOneByUser(id, userId);
+  ): Promise<BudgetModel> {
+    const budget = await this.findEntityByUser(id, userId);
     this.budgetsRepo.merge(budget, data as Partial<Budget>);
-    return this.budgetsRepo.save(budget);
+    const saved = await this.budgetsRepo.save(budget);
+    return BudgetModel.fromEntity(saved);
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const budget = await this.findOneByUser(id, userId);
+    const budget = await this.findEntityByUser(id, userId);
     await this.budgetsRepo.remove(budget);
   }
 }
