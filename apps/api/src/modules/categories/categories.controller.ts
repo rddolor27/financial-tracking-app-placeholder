@@ -16,9 +16,11 @@ import { InjectCategoriesService } from './categories.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
+  type CreateCategoryDto,
   CreateCategorySchema,
+  type UpdateCategoryDto,
   UpdateCategorySchema,
-} from '@financial-tracker/shared-types';
+} from './dtos';
 
 @Controller('categories')
 @UseGuards(JwtAuthGuard)
@@ -43,7 +45,7 @@ export class CategoriesController {
   @Post()
   async create(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateCategorySchema)) body: Record<string, unknown>,
+    @Body(new ZodValidationPipe(CreateCategorySchema)) body: CreateCategoryDto,
   ) {
     return this.categoriesService.create(req.user.id, body);
   }
@@ -52,7 +54,7 @@ export class CategoriesController {
   async update(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateCategorySchema)) body: Record<string, unknown>,
+    @Body(new ZodValidationPipe(UpdateCategorySchema)) body: UpdateCategoryDto,
   ) {
     return this.categoriesService.update(id, req.user.id, body);
   }

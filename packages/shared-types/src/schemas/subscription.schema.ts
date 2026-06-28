@@ -78,6 +78,7 @@ export type Payment = z.infer<typeof PaymentSchema>;
 
 export const CheckoutRequestSchema = z.object({
   plan_id: z.string().uuid(),
+  platform: z.enum(['web', 'mobile']),
   billing_type: BillingTypeEnum,
   payment_method: PaymentMethodEnum.optional(),
 });

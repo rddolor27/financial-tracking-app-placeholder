@@ -72,6 +72,8 @@ describe('TransactionsService', () => {
         type: 'expense' as const,
         amount: 500,
         date: '2026-06-28',
+        is_recurring: false,
+        tags: [] as string[],
       };
       const account = { id: 'a1', user_id: 'u1', balance: 1000 };
       const tx = { id: 't1', user_id: 'u1', ...dto } as Transaction;
@@ -94,6 +96,8 @@ describe('TransactionsService', () => {
         type: 'income' as const,
         amount: 1000,
         date: '2026-06-28',
+        is_recurring: false,
+        tags: [] as string[],
       };
       const account = { id: 'a1', user_id: 'u1', balance: 500 };
       const tx = { id: 't1', user_id: 'u1', ...dto } as Transaction;

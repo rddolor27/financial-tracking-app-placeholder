@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Investment } from './investment.entity';
 import { InvestmentTransaction } from './investment-transaction.entity';
+import type { CreateInvestmentDto, UpdateInvestmentDto, CreateInvestmentTransactionDto } from './dtos';
 
 @Injectable()
 export class InvestmentsService {
@@ -30,14 +31,14 @@ export class InvestmentsService {
     return investment;
   }
 
-  async create(userId: string, data: Partial<Investment>): Promise<Investment> {
+  async create(userId: string, data: CreateInvestmentDto): Promise<Investment> {
     const investment = this.investmentsRepo.create({ ...data, user_id: userId });
     return this.investmentsRepo.save(investment);
   }
 
-  async update(id: string, userId: string, data: Partial<Investment>): Promise<Investment> {
+  async update(id: string, userId: string, data: UpdateInvestmentDto | Partial<Investment>): Promise<Investment> {
     const investment = await this.findOneByUser(id, userId);
-    this.investmentsRepo.merge(investment, data);
+    this.investmentsRepo.merge(investment, data as Partial<Investment>);
     return this.investmentsRepo.save(investment);
   }
 
@@ -57,7 +58,7 @@ export class InvestmentsService {
 
   async createTransaction(
     userId: string,
-    data: Partial<InvestmentTransaction>,
+    data: CreateInvestmentTransactionDto & { investment_id: string },
   ): Promise<InvestmentTransaction> {
     await this.findOneByUser(data.investment_id!, userId);
     const tx = this.investmentTxRepo.create({ ...data, user_id: userId });

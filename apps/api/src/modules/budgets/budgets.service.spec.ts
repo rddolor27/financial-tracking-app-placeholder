@@ -70,6 +70,7 @@ describe('BudgetsService', () => {
         amount: 5000,
         period: 'monthly' as const,
         start_date: '2026-07-01',
+        alert_threshold: 80,
       };
       const budget = { id: '1', user_id: 'u1', ...dto } as Budget;
       repo.create.mockReturnValue(budget);

@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, UseGuards, Req, Delete } from '@nestjs/com
 import type { SubscriptionsService } from './subscriptions.service';
 import { InjectSubscriptionsService } from './subscriptions.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import { type CheckoutRequestDto, CheckoutRequestSchema } from './dtos';
 
 @Controller('subscriptions')
 export class SubscriptionsController {
@@ -30,7 +32,7 @@ export class SubscriptionsController {
   @UseGuards(JwtAuthGuard)
   async subscribe(
     @Req() req: { user: { id: string } },
-    @Body() body: { plan_id: string; platform: 'web' | 'mobile' },
+    @Body(new ZodValidationPipe(CheckoutRequestSchema)) body: CheckoutRequestDto,
   ) {
     return this.subscriptionsService.createSubscription(req.user.id, body.plan_id, body.platform);
   }

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Goal } from './goal.entity';
+import type { CreateGoalDto, UpdateGoalDto } from './dtos';
 
 @Injectable()
 export class GoalsService {
@@ -23,12 +24,12 @@ export class GoalsService {
     return goal;
   }
 
-  async create(userId: string, data: Partial<Goal>): Promise<Goal> {
+  async create(userId: string, data: CreateGoalDto): Promise<Goal> {
     const goal = this.goalsRepo.create({ ...data, user_id: userId, current_amount: 0 });
     return this.goalsRepo.save(goal);
   }
 
-  async update(id: string, userId: string, data: Partial<Goal>): Promise<Goal> {
+  async update(id: string, userId: string, data: UpdateGoalDto): Promise<Goal> {
     const goal = await this.findOneByUser(id, userId);
     this.goalsRepo.merge(goal, data);
     return this.goalsRepo.save(goal);

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import type { AccountsService } from '../accounts/accounts.service';
 import { InjectAccountsService } from '../accounts/accounts.providers';
+import type { CreateTransactionDto, UpdateTransactionDto } from './dtos';
 
 @Injectable()
 export class TransactionsService {
@@ -89,7 +90,7 @@ export class TransactionsService {
 
   async create(
     userId: string,
-    data: Partial<Transaction>,
+    data: CreateTransactionDto,
   ): Promise<Transaction> {
     const account = await this.accountsService.findOneByUser(
       data.account_id!,
@@ -129,10 +130,10 @@ export class TransactionsService {
   async update(
     id: string,
     userId: string,
-    data: Partial<Transaction>,
+    data: UpdateTransactionDto,
   ): Promise<Transaction> {
     const tx = await this.findOneByUser(id, userId);
-    this.txRepo.merge(tx, data);
+    this.txRepo.merge(tx, data as Partial<Transaction>);
     return this.txRepo.save(tx);
   }
 

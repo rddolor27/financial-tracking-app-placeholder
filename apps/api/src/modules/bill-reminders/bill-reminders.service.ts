@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BillReminder } from './bill-reminder.entity';
+import type { CreateBillReminderDto, UpdateBillReminderDto } from './dtos';
 
 @Injectable()
 export class BillRemindersService {
@@ -23,12 +24,12 @@ export class BillRemindersService {
     return reminder;
   }
 
-  async create(userId: string, data: Partial<BillReminder>): Promise<BillReminder> {
+  async create(userId: string, data: CreateBillReminderDto): Promise<BillReminder> {
     const reminder = this.billRemindersRepo.create({ ...data, user_id: userId });
     return this.billRemindersRepo.save(reminder);
   }
 
-  async update(id: string, userId: string, data: Partial<BillReminder>): Promise<BillReminder> {
+  async update(id: string, userId: string, data: UpdateBillReminderDto): Promise<BillReminder> {
     const reminder = await this.findOneByUser(id, userId);
     this.billRemindersRepo.merge(reminder, data);
     return this.billRemindersRepo.save(reminder);

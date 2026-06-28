@@ -55,7 +55,15 @@ describe('InvestmentsService', () => {
 
   describe('create', () => {
     it('should create an investment', async () => {
-      const dto = { symbol: 'BTC', name: 'Bitcoin', asset_type: 'crypto' as const };
+      const dto = {
+        symbol: 'BTC',
+        name: 'Bitcoin',
+        asset_type: 'crypto' as const,
+        account_id: 'a1',
+        currency: 'PHP',
+        quantity: 0,
+        avg_buy_price: 0,
+      };
       const investment = { id: '1', user_id: 'u1', ...dto } as Investment;
       repo.create.mockReturnValue(investment);
       repo.save.mockResolvedValue(investment);

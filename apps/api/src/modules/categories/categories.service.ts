@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { Category } from './category.entity';
+import type { CreateCategoryDto, UpdateCategoryDto } from './dtos';
 
 @Injectable()
 export class CategoriesService {
@@ -34,7 +35,7 @@ export class CategoriesService {
     return category;
   }
 
-  async create(userId: string, data: Partial<Category>): Promise<Category> {
+  async create(userId: string, data: CreateCategoryDto): Promise<Category> {
     const category = this.categoriesRepo.create({
       ...data,
       user_id: userId,
@@ -46,7 +47,7 @@ export class CategoriesService {
   async update(
     id: string,
     userId: string,
-    data: Partial<Category>,
+    data: UpdateCategoryDto,
   ): Promise<Category> {
     const category = await this.findOneForUser(id, userId);
 

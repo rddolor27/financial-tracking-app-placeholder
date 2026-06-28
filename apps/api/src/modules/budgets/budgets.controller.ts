@@ -16,9 +16,11 @@ import { InjectBudgetsService } from './budgets.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
+  type CreateBudgetDto,
   CreateBudgetSchema,
+  type UpdateBudgetDto,
   UpdateBudgetSchema,
-} from '@financial-tracker/shared-types';
+} from './dtos';
 
 @Controller('budgets')
 @UseGuards(JwtAuthGuard)
@@ -43,7 +45,7 @@ export class BudgetsController {
   @Post()
   async create(
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(CreateBudgetSchema)) body: Record<string, unknown>,
+    @Body(new ZodValidationPipe(CreateBudgetSchema)) body: CreateBudgetDto,
   ) {
     return this.budgetsService.create(req.user.id, body);
   }
@@ -52,7 +54,7 @@ export class BudgetsController {
   async update(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
-    @Body(new ZodValidationPipe(UpdateBudgetSchema)) body: Record<string, unknown>,
+    @Body(new ZodValidationPipe(UpdateBudgetSchema)) body: UpdateBudgetDto,
   ) {
     return this.budgetsService.update(id, req.user.id, body);
   }

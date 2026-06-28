@@ -11,7 +11,7 @@ import type { UsersService } from './users.service';
 import { InjectUsersService } from './users.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import { UpdateUserSchema } from '@financial-tracker/shared-types';
+import { type UpdateUserDto, UpdateUserSchema } from './dtos';
 
 @Controller('users')
 export class UsersController {
@@ -35,7 +35,7 @@ export class UsersController {
   async updateProfile(
     @Req() req: { user: { id: string } },
     @Body(new ZodValidationPipe(UpdateUserSchema))
-    body: { first_name?: string; last_name?: string; currency?: string },
+    body: UpdateUserDto,
   ) {
     const user = await this.usersService.update(req.user.id, body);
     const { password_hash: _ph, google_id: _gid, ...profile } = user;

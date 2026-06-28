@@ -17,9 +17,11 @@ import { InjectTransactionsService } from './transactions.providers';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
+  type CreateTransactionDto,
   CreateTransactionSchema,
+  type UpdateTransactionDto,
   UpdateTransactionSchema,
-} from '@financial-tracker/shared-types';
+} from './dtos';
 
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
@@ -64,7 +66,7 @@ export class TransactionsController {
   async create(
     @Req() req: { user: { id: string } },
     @Body(new ZodValidationPipe(CreateTransactionSchema))
-    body: Record<string, unknown>,
+    body: CreateTransactionDto,
   ) {
     return this.transactionsService.create(req.user.id, body);
   }
@@ -74,7 +76,7 @@ export class TransactionsController {
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
     @Body(new ZodValidationPipe(UpdateTransactionSchema))
-    body: Record<string, unknown>,
+    body: UpdateTransactionDto,
   ) {
     return this.transactionsService.update(id, req.user.id, body);
   }

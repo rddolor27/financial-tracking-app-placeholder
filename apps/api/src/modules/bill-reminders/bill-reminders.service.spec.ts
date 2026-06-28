@@ -44,7 +44,15 @@ describe('BillRemindersService', () => {
 
   describe('create', () => {
     it('should create a bill reminder', async () => {
-      const dto = { name: 'Electric Bill', amount: 2500, due_day: 15 };
+      const dto = {
+        name: 'Electric Bill',
+        amount: 2500,
+        due_day: 15,
+        currency: 'PHP',
+        frequency: 'monthly' as const,
+        reminder_days_before: 3,
+        auto_create_transaction: false,
+      };
       const reminder = { id: '1', user_id: 'u1', ...dto } as BillReminder;
       repo.create.mockReturnValue(reminder);
       repo.save.mockResolvedValue(reminder);
