@@ -61,6 +61,21 @@ financial-tracker-v2/
 - Set up shared `tsconfig.base.json` for consistent TS settings
 - Configure Turbo pipelines: `build`, `dev`, `lint`, `test`
 
+### App Initialization — Always Use Official CLI Tools
+**IMPORTANT:** Each app MUST be initialized using its framework's official CLI scaffolding tool, NOT by hand-writing `package.json` files. This ensures all required framework dependencies, default configs, boilerplate files, and scripts are correctly set up.
+
+- **NestJS (`apps/api`):** `npx @nestjs/cli new api --package-manager pnpm --skip-git` (inside `apps/` directory), then adjust for monorepo
+- **Next.js (`apps/web`):** `npx create-next-app@latest web --typescript --app --tailwind --eslint --src-dir --import-alias "@/*"` (inside `apps/` directory), then adjust for monorepo
+- **Expo (`apps/mobile`):** `npx create-expo-app mobile --template blank-typescript` (inside `apps/` directory), then adjust for monorepo
+
+After scaffolding each app:
+1. Update `tsconfig.json` to extend `../../tsconfig.base.json` (keep framework-specific overrides)
+2. Add workspace dependencies (`@financial-tracker/shared-types`, etc.) to `package.json`
+3. Add `jest.config.ts` extending the root `jest.config.base.ts`
+4. Verify the app runs with its default dev command before adding customizations
+
+**Shared packages** (`packages/*`) are plain TypeScript libraries and can be initialized manually with hand-written `package.json` files — no CLI tool needed.
+
 ## Database Schema Design
 
 ### Entity Relationship Overview
@@ -1432,6 +1447,12 @@ All initialization and infrastructure must be completed **before** any feature w
    ```
 5. **ESLint + Prettier** — shared flat config at root, per-app extensions (`eslint-config-next` for web, React Native rules for mobile)
 6. **Husky + lint-staged** (optional) — pre-commit hooks for auto-format
+7. **Scaffold apps via official CLI tools** — NEVER hand-write app `package.json` files. Use:
+   - `npx @nestjs/cli new api --package-manager pnpm --skip-git` for backend
+   - `npx create-next-app@latest web --typescript --app --tailwind --eslint --src-dir --import-alias "@/*"` for web
+   - `npx create-expo-app mobile --template blank-typescript` for mobile
+   - After each scaffold: adjust `tsconfig.json` to extend base, add workspace deps, add jest config
+   - Shared packages (`packages/*`) are plain TS libraries — manual `package.json` is fine
 
 ### Phase 2: Shared Packages Initialization
 Initialize each package with `package.json`, `tsconfig.json` (extending base), `jest.config.ts`, and empty `src/index.ts` export barrel.
@@ -1446,7 +1467,7 @@ Initialize each package with `package.json`, `tsconfig.json` (extending base), `
 Each package must build independently via `turbo build` before proceeding.
 
 ### Phase 3: Backend App Initialization (`apps/api`)
-1. **Initialize NestJS** — `@nestjs/cli new`, configure TypeORM with PostgreSQL connection, `synchronize: false`
+1. **Initialize NestJS via CLI** — run `npx @nestjs/cli new api --package-manager pnpm --skip-git` inside `apps/`, then adjust `tsconfig.json` to extend `../../tsconfig.base.json`, add workspace deps, configure TypeORM with PostgreSQL connection, `synchronize: false`
 2. **Database config** — data source config, migration scripts in `package.json`
 3. **Environment config** — `@nestjs/config` + Zod validation for env vars at startup
 4. **Entity files** — create all TypeORM entity files (User, Account, Category, Transaction, Budget, Investment, InvestmentTransaction, Statement, Notification, RefreshToken, Goal, BillReminder, SubscriptionPlan, Subscription, Payment) with proper decorators and relationships
@@ -1458,7 +1479,7 @@ Each package must build independently via `turbo build` before proceeding.
 10. **Verify** — `pnpm --filter api start:dev` connects to DB, runs migrations, seeds categories
 
 ### Phase 4: Web App Initialization (`apps/web`)
-1. **Initialize Next.js** — App Router, TypeScript
+1. **Initialize Next.js via CLI** — run `npx create-next-app@latest web --typescript --app --tailwind --eslint --src-dir --import-alias "@/*"` inside `apps/`, then adjust `tsconfig.json` to extend `../../tsconfig.base.json`, add workspace deps
 2. **Chakra UI setup** — `ChakraProvider` with custom theme (light + dark mode tokens, semantic colors)
 3. **Tailwind CSS setup** — `tailwind.config.ts` with Chakra-compatible config, `dark:` variant
 4. **Providers** — `QueryClientProvider`, `ChakraProvider` (with `ColorModeScript`), Auth provider
@@ -1467,7 +1488,7 @@ Each package must build independently via `turbo build` before proceeding.
 7. **Verify** — `pnpm --filter web dev` renders empty shell with Chakra + Tailwind working, dark mode toggleable
 
 ### Phase 5: Mobile App Initialization (`apps/mobile`)
-1. **Initialize Expo** — managed workflow, TypeScript template
+1. **Initialize Expo via CLI** — run `npx create-expo-app mobile --template blank-typescript` inside `apps/`, then adjust `tsconfig.json` to extend `../../tsconfig.base.json`, add workspace deps
 2. **NativeBase setup** — `NativeBaseProvider` with custom theme (aligned with web Chakra theme tokens)
 3. **Drizzle + SQLite** — `drizzle.config.ts`, schema file mirroring backend entities + sync columns, `expo-sqlite` connection
 4. **Generate initial Drizzle migration** — `drizzle-kit generate`
