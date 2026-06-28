@@ -1,7 +1,63 @@
 # UI-PLAN.md — Financial Tracker V2
 
 ## Overview
-A personal financial tracker with a **web app** (Next.js + Chakra UI + Tailwind CSS) and a **mobile app** (Expo + React Native + NativeBase). Both share the same design language, color palette, and iconography. The mobile app is offline-first. Default currency: PHP.
+A personal financial tracker with a **web app** (Next.js + Tailwind CSS) and a **mobile app** (Expo + React Native + NativeBase). Both share the same design language, color palette, and iconography. The mobile app is offline-first. Default currency: PHP.
+
+> **Note:** The web app uses **Tailwind CSS only** for styling (no Chakra UI components). ChakraProvider was removed due to CSS conflicts with Tailwind v4. All web UI is built with Tailwind utility classes.
+
+---
+
+## Current Implementation Status
+
+### Web App — Pages Built
+All pages use Tailwind CSS utility classes, `react-hook-form` + `zodResolver` for forms, and TanStack Query hooks for data fetching.
+
+| Route | Status | Description |
+|-------|--------|-------------|
+| `/` | Done | Redirect: authenticated → `/dashboard`, unauthenticated → `/login` |
+| `/login` | Done | Email/password sign-in form, server error display, link to register |
+| `/register` | Done | First/last name, email, password, default currency PHP |
+| `/dashboard` | Done | 4 summary cards, recent transactions, active goals, upcoming bills |
+| `/accounts` | Done | 3-column card grid, inline create form, delete per card |
+| `/transactions` | Done | Table view, inline create form, colored type/amount badges |
+| `/categories` | Done | 2-column (expense/income), hide defaults, delete custom |
+| `/budgets` | Done | 3-column card grid, progress bar placeholder, alert threshold |
+| `/investments` | Done | Table with P&L, inline create form, investment accounts only |
+| `/goals` | Done | 2-column cards, progress bars, inline "Add Funds" flow |
+| `/bills` | Done | Vertical list, inline create form, auto-create badge |
+| `/insights` | Done | Period selector, spending by category bars, monthly trends table |
+| `/settings` | Done | Profile form, change password, read-only email |
+| `/import` | Done | 2-step CSV import (upload + preview/confirm) |
+| `/export` | Done | Date range + format cards (CSV, Excel, PDF) |
+
+### Web App — Components Built
+| Component | Description |
+|-----------|-------------|
+| `AuthGuard` | Redirects to `/login` if not authenticated |
+| `Sidebar` | 256px fixed sidebar with 12 nav links, theme toggle, sign out |
+| `ThemeProvider` | Manages dark/light/system mode via `dark` class on `<html>` |
+
+### Web App — Lib/Hooks Built
+| File | Description |
+|------|-------------|
+| `api.ts` | Axios client setup, token refresh, service singletons for all modules |
+| `auth-hooks.ts` | `useLogin`, `useRegister`, `useLogout`, `useCurrentUser` |
+| `crud-hooks.ts` | All CRUD hooks: accounts, transactions, categories, budgets, goals, bills, investments, insights |
+| `env.ts` | Zod-validated env vars (`NEXT_PUBLIC_API_URL`) |
+
+### Backend — Seeded Data
+Two demo users with password `Home@1234`:
+- `admin@financialtracker.com` (Admin User)
+- `demo@financialtracker.com` (Demo User)
+
+Per user demo data:
+- **4 accounts:** Cash Wallet (₱5k), BDO Savings (₱50k), GCash (₱12k), BPI Credit Card (-₱15k)
+- **27 transactions:** Realistic mix over 2 months (salary, groceries, dining, transport, utilities, subscriptions, entertainment, etc.)
+- **4 budgets:** Food & Dining (₱15k/mo), Transportation (₱5k/mo), Entertainment (₱3k/mo), Groceries (₱10k/mo)
+- **2 goals:** Emergency Fund (₱45k/₱100k), New Laptop (₱25k/₱80k)
+- **3 bill reminders:** Meralco Electric (day 15), PLDT Internet (day 5), Netflix (day 20)
+- **18 default categories:** 14 expense + 4 income (system defaults, user_id=NULL)
+- **3 subscription plans:** Free, Premium Web (₱199/mo), Premium Mobile (₱499 one-time)
 
 ---
 
@@ -27,8 +83,10 @@ A personal financial tracker with a **web app** (Next.js + Chakra UI + Tailwind 
 
 **Why purple + teal:** Purple is the brand identity. Teal provides a complementary cool-tone accent that contrasts well without clashing. Green/red remain reserved for income/expense semantics. Gold/yellow highlights premium features.
 
+> **Current state:** The web app currently uses `blue-600` for primary buttons and `zinc-*` for neutrals (Tailwind defaults). These should be migrated to the purple primary palette defined above.
+
 ### Typography
-- **Web:** Inter (headings + body) — clean, modern, excellent readability
+- **Web:** Geist + Geist Mono (loaded via `next/font/google` in `layout.tsx`)
 - **Mobile:** System default (San Francisco on iOS, Roboto on Android)
 - **Scale:**
   - `xs`: 12px — captions, timestamps
@@ -65,6 +123,8 @@ Uses 4px base unit: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80`
 - **Mobile:** `@expo/vector-icons` — Feather for UI, MaterialIcons/FontAwesome for categories
 - Icon size: 20px (inline), 24px (list items), 32px (cards), 48px (empty states)
 
+> **Current state:** The web sidebar uses emoji-style text icons. Category icons are stored in the DB as `fa-*` strings but not yet rendered as actual icon components.
+
 ---
 
 ## Component Library
@@ -78,11 +138,15 @@ Uses 4px base unit: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80`
 | `danger` | Destructive actions (Delete) | Red filled or red outline |
 | `icon` | Icon-only actions (menu, close, settings) | Ghost style, square, centered icon |
 
+> **Current state:** Buttons use inline Tailwind classes (e.g., `bg-blue-600 hover:bg-blue-700 text-white rounded-lg`). No shared button component exists yet. Should be extracted into a reusable `<Button>` component with variant props.
+
 ### Cards
 - White/dark surface with subtle shadow (light) or border (dark)
 - 12px radius, 16-24px padding
 - Optional header with title + action button
 - Used for: account cards, transaction items, budget cards, goal cards, widgets
+
+> **Current state:** Cards use `bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700 p-6`. Pattern is consistent across pages but not extracted into a component.
 
 ### Form Inputs
 - Label above input (always visible, not placeholder-as-label)
@@ -92,12 +156,16 @@ Uses 4px base unit: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80`
 - Helper text in muted color below input
 - Consistent height: 40px (web), 48px (mobile, larger touch target)
 
+> **Current state:** Inputs use `w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500`. Validation errors show as red `<p>` elements below inputs. Pattern is consistent but not componentized.
+
 ### Transaction Amount Display
 - Income: green text with `+` prefix
 - Expense: red text with `-` prefix
 - Transfer: blue text with arrow icon
 - Currency symbol before amount (e.g., `PHP 1,234.50`)
 - Always 2 decimal places for fiat, up to 8 for crypto
+
+> **Current state:** Transaction page colors amounts green (income) / red (expense) / blue (transfer). Dashboard uses `formatCurrency()` from shared-utils. The amount display is inline, not a component.
 
 ### Tags/Chips
 - Pill shape (16px radius)
@@ -112,11 +180,15 @@ Uses 4px base unit: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80`
 - CTA button if applicable
 - Example: "No transactions yet — Add your first transaction"
 
+> **Current state:** Empty states exist but are minimal — just text like "No accounts yet." or "No transactions yet." with no icons or illustrations.
+
 ### Loading States
 - Skeleton screens (shimmer effect) for content loading
 - Spinner for action buttons (inline, replaces text)
 - Pull-to-refresh on mobile lists
 - Progressive loading for charts
+
+> **Current state:** Loading states show "Loading..." text. The root redirect page (`/`) shows a CSS spinner. No skeleton screens implemented yet.
 
 ### Toast/Snackbar Notifications
 - Bottom-center (web), bottom (mobile)
@@ -125,32 +197,41 @@ Uses 4px base unit: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80`
 - Info: blue left border
 - Auto-dismiss after 4 seconds, swipe to dismiss on mobile
 
+> **Current state:** No toast system implemented. Errors show as inline banners or `alert()`. Success feedback is missing in most mutation flows.
+
 ---
 
 ## Navigation Structure
 
 ### Web — Sidebar + Top Bar
+
+> **Current implementation:** Fixed 256px sidebar (no top bar). No collapsible behavior. No notification bell. Theme toggle is in the sidebar footer. User name displayed at bottom.
+
 ```
 ┌──────────────────────────────────────────────────┐
-│ [Logo] Financial Tracker          [🔔] [🌙] [👤] │  ← Top bar
+│ Financial Tracker                                 │  ← Sidebar header
 ├──────────┬───────────────────────────────────────┤
 │          │                                       │
 │ Dashboard│         Main Content Area             │
-│ Accounts │                                       │
+│ Accounts │         (p-6, bg-zinc-50)             │
 │ Transact.│                                       │
 │ Budgets  │                                       │
+│ Categor. │                                       │
 │ Invest.  │                                       │
 │ Goals    │                                       │
 │ Bills    │                                       │
 │ Insights │                                       │
-│ ──────── │                                       │
+│ Export   │                                       │
 │ Import   │                                       │
-│ Statmnts │                                       │
-│ ──────── │                                       │
 │ Settings │                                       │
-│          │                                       │
+│ ──────── │                                       │
+│ [User]   │                                       │
+│ [Theme]  │                                       │
+│ [Logout] │                                       │
 └──────────┴───────────────────────────────────────┘
 ```
+
+**Target design:**
 - Sidebar: 240px wide, collapsible to 64px (icon-only) on smaller screens
 - Top bar: logo left, notification bell + dark mode toggle + user avatar right
 - Active nav item: primary color background, primary color text + icon
@@ -182,8 +263,10 @@ Uses 4px base unit: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80`
 ## Screens — Web App
 
 ### 1. Dashboard
-The main landing page after login. Overview of financial health.
 
+> **Current implementation:** Shows 4 summary cards in a row (Total Balance, Monthly Income, Monthly Expenses, Net This Month), then a 2-column grid with recent transactions list and goals + bills sidebar. Uses `zinc-*` colors, `blue-600` accents. No charts — values are text only.
+
+**Target design:**
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Dashboard                                     June 2026 │
@@ -238,31 +321,26 @@ The main landing page after login. Overview of financial health.
 
 ### 2. Accounts Page
 
+> **Current implementation:** 3-column card grid showing color dot, account type badge, name, bank name, balance. Inline form toggle for creation. Delete button per card. No proportional bars, no custom logos.
+
+**Target design:**
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Accounts                                  [+ Add Account]│
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│ Total Balance: PHP 245,830.50                           │
+│ Total Balance: PHP 52,000.00                            │
 │                                                         │
 │ ┌─────────────────────────┐ ┌─────────────────────────┐ │
 │ │ [BDO Logo] BDO Savings  │ │ [GCash Logo] GCash      │ │
 │ │ Savings Account         │ │ E-Wallet                │ │
-│ │ PHP 120,500.00          │ │ PHP 8,350.00            │ │
-│ │ ██████████████████      │ │ ███░░░░░░░░░░░░░░░      │ │
+│ │ PHP 50,000.00           │ │ PHP 12,000.00           │ │
 │ └─────────────────────────┘ └─────────────────────────┘ │
 │                                                         │
 │ ┌─────────────────────────┐ ┌─────────────────────────┐ │
-│ │ 💰 Cash on Hand         │ │ 💳 BPI Credit Card      │ │
+│ │ 💰 Cash Wallet          │ │ 💳 BPI Credit Card      │ │
 │ │ Cash                    │ │ Credit Card             │ │
-│ │ PHP 5,200.00            │ │ PHP -12,450.00          │ │
-│ │ █░░░░░░░░░░░░░░░░░      │ │ ████████████ (red)      │ │
-│ └─────────────────────────┘ └─────────────────────────┘ │
-│                                                         │
-│ ┌─────────────────────────┐ ┌─────────────────────────┐ │
-│ │ 📈 COL Financial        │ │ 💵 USD Savings           │ │
-│ │ Investment              │ │ Savings Account         │ │
-│ │ PHP 95,000.00           │ │ $450.00 (PHP 25,380)    │ │
+│ │ PHP 5,000.00            │ │ PHP -15,000.00          │ │
 │ └─────────────────────────┘ └─────────────────────────┘ │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -273,7 +351,6 @@ The main landing page after login. Overview of financial health.
 - Account type badge (chip)
 - Balance in native currency
 - If foreign currency: converted amount in PHP below
-- Proportional bar showing balance relative to total
 - Credit cards show negative balance in red
 - Click card → Account Detail page (transactions filtered to that account)
 
@@ -289,6 +366,9 @@ The main landing page after login. Overview of financial health.
 
 ### 3. Transactions Page
 
+> **Current implementation:** Full-width HTML table with columns: Date, Description, Type, Amount, Actions. Inline form toggle. Type badges colored green/red/blue. No search, no filters, no grouping by date, no pagination. Category not shown in the list.
+
+**Target design:**
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Transactions                              [+ Add Trans.] │
@@ -356,6 +436,9 @@ The main landing page after login. Overview of financial health.
 
 ### 4. Budgets Page
 
+> **Current implementation:** 3-column card grid with period badge, budget amount, and progress bar placeholder (always at 0% — no actual spending calculation). Alert threshold shown as text.
+
+**Target design:**
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Budgets                                   [+ Add Budget] │
@@ -363,21 +446,21 @@ The main landing page after login. Overview of financial health.
 │ June 2026                          [◀ Prev] [Next ▶]    │
 │                                                         │
 │ ┌──────────────────────────────────────────────────────┐│
-│ │ 🍔 Food & Dining           PHP 8,500 / PHP 12,000   ││
-│ │ ██████████████████████░░░░░░░░ 71%                   ││
-│ │ PHP 3,500 remaining · 3 days left                    ││
+│ │ 🍔 Food & Dining           PHP 8,500 / PHP 15,000   ││
+│ │ ██████████████████████░░░░░░░░ 57%                   ││
+│ │ PHP 6,500 remaining · 3 days left                    ││
 │ ├──────────────────────────────────────────────────────┤│
-│ │ 🚗 Transportation          PHP 3,200 / PHP 5,000    ││
-│ │ ████████████████░░░░░░░░░░░░░ 64%                   ││
+│ │ 🚗 Transportation          PHP 1,950 / PHP 5,000    ││
+│ │ ████████████░░░░░░░░░░░░░░░░ 39%                    ││
+│ │ PHP 3,050 remaining · 3 days left                    ││
+│ ├──────────────────────────────────────────────────────┤│
+│ │ 🎮 Entertainment           PHP 2,300 / PHP 3,000    ││
+│ │ ████████████████████████░░░░ 77%    ⚠️ Near limit    ││
+│ │ PHP 700 remaining · 3 days left                      ││
+│ ├──────────────────────────────────────────────────────┤│
+│ │ 🛒 Groceries               PHP 8,200 / PHP 10,000   ││
+│ │ █████████████████████████░░░░ 82%    ⚠️ Alert!       ││
 │ │ PHP 1,800 remaining · 3 days left                    ││
-│ ├──────────────────────────────────────────────────────┤│
-│ │ 📺 Subscriptions           PHP 2,850 / PHP 3,000    ││
-│ │ █████████████████████████████░ 95%    ⚠️ Alert!      ││
-│ │ PHP 150 remaining · 3 days left                      ││
-│ ├──────────────────────────────────────────────────────┤│
-│ │ 🎮 Entertainment           PHP 1,200 / PHP 4,000    ││
-│ │ █████████░░░░░░░░░░░░░░░░░░░ 30%                    ││
-│ │ PHP 2,800 remaining · 3 days left                    ││
 │ └──────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────┘
 ```
@@ -390,15 +473,11 @@ The main landing page after login. Overview of financial health.
 - Alert badge when threshold exceeded
 - Click → drill-down showing transactions in that category for the period
 
-**Add/Edit Budget Form:**
-- Category (dropdown, one budget per category per period)
-- Budget amount
-- Period: weekly / monthly / yearly
-- Alert threshold (slider: 50% - 100%, default 80%)
-- Start date
-
 ### 5. Investments Page
 
+> **Current implementation:** Table with columns: Symbol, Name, Type, Qty, Avg Price, Current Price, Value, P&L (with %, colored). Inline form for creation. Uses purple accent color for buttons.
+
+**Target design:**
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Investments                            [+ Add Holding]   │
@@ -431,70 +510,59 @@ The main landing page after login. Overview of financial health.
 
 ### 6. Goals Page
 
+> **Current implementation:** 2-column card grid with name, current/target amounts, progress bar (uses goal's color), completion badge, target date. Inline "Add Funds" flow (click reveals number input + Save/Cancel). Uses green accent buttons.
+
+**Target design:**
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Financial Goals                            [+ Add Goal]  │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
 │ ┌──────────────────────────────────────────────────────┐│
-│ │ 🎯 Emergency Fund                                   ││
-│ │ PHP 72,000 / PHP 100,000                       72%  ││
-│ │ ██████████████████████████░░░░░░░░░                  ││
-│ │ Target: Dec 2026 · PHP 28,000 to go                  ││
+│ │ 🛡️ Emergency Fund                                   ││
+│ │ PHP 45,000 / PHP 100,000                       45%  ││
+│ │ █████████████████░░░░░░░░░░░░░░░░░░░                ││
+│ │ PHP 55,000 to go                                     ││
 │ │                                    [+ Contribute]    ││
 │ ├──────────────────────────────────────────────────────┤│
-│ │ ✈️ Japan Trip                                        ││
-│ │ PHP 35,000 / PHP 80,000                        44%  ││
-│ │ █████████████░░░░░░░░░░░░░░░░░░                      ││
-│ │ Target: Mar 2027 · PHP 45,000 to go                  ││
+│ │ 💻 New Laptop                                       ││
+│ │ PHP 25,000 / PHP 80,000                        31%  ││
+│ │ █████████░░░░░░░░░░░░░░░░░░░░░░░░░                  ││
+│ │ Target: Dec 2026 · PHP 55,000 to go                  ││
 │ │                                    [+ Contribute]    ││
-│ ├──────────────────────────────────────────────────────┤│
-│ │ 🎓 Course Fund                          ✅ Completed ││
-│ │ PHP 15,000 / PHP 15,000                       100%  ││
-│ │ █████████████████████████████████████████████████████ ││
-│ │ Completed: Jun 15, 2026                              ││
 │ └──────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Goal Cards:**
-- Icon + color indicator (user-chosen)
-- Name, progress bar, percentage
-- Current amount / target amount
-- Target date + remaining amount
-- "Contribute" button → modal with amount input
-- Completed goals: green checkmark, grayed out or celebratory style
-
 ### 7. Bill Reminders Page
 
+> **Current implementation:** Vertical list with name, amount, due day, frequency, auto-create badge, inactive badge. Inline form for creation. Uses orange accent buttons.
+
+**Target design:**
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Bill Reminders                         [+ Add Reminder]  │
 ├─────────────────────────────────────────────────────────┤
-│ [List View] [Calendar View]                             │
 │                                                         │
-│ Due This Week                                           │
+│ Due Soon                                                │
 │ ┌──────────────────────────────────────────────────────┐│
-│ │ 🔴 Netflix              Jul 1      PHP 549    [Pay] ││
-│ │    Monthly · Auto-create transaction                 ││
-│ ├──────────────────────────────────────────────────────┤│
-│ │ 🟡 Electric Bill         Jul 5      PHP 3,200  [Pay] ││
+│ │ ⚡ Meralco Electric Bill   Day 15    PHP 3,500 [Pay] ││
 │ │    Monthly · Reminder 3 days before                  ││
-│ └──────────────────────────────────────────────────────┘│
-│                                                         │
-│ Due Later                                               │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ ⚪ Internet               Jul 10     PHP 1,899  [Pay] ││
-│ │ ⚪ Insurance              Jul 15     PHP 5,000  [Pay] ││
-│ │ ⚪ Rent                   Jul 30     PHP 15,000 [Pay] ││
+│ ├──────────────────────────────────────────────────────┤│
+│ │ 🌐 PLDT Internet          Day 5     PHP 1,899 [Pay] ││
+│ │    Monthly · Reminder 3 days before                  ││
+│ ├──────────────────────────────────────────────────────┤│
+│ │ 🎬 Netflix Subscription   Day 20    PHP 549   [Pay] ││
+│ │    Monthly · Auto-create transaction                 ││
 │ └──────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Calendar View:** Monthly calendar grid with colored dots on bill due dates. Tap a day to see bills due.
-
 ### 8. Insights Page
 
+> **Current implementation:** Period selector with 3 options (7d/30d/1y). Four summary cards (income, expenses, net, savings rate). Spending by category shown as horizontal Tailwind-div bars (no chart library). Monthly trends shown as a table. Bug: category names show UUIDs instead of resolved names.
+
+**Target design:**
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Spending Insights                [This Month ▾]          │
@@ -519,207 +587,39 @@ The main landing page after login. Overview of financial health.
 │ │                          │ │    │██████│             ││
 │ │ Net: +PHP 23,000         │ │    ╰──────╯             ││
 │ └──────────────────────────┘ └─────────────────────────┘│
-│                                                         │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ Budget Health                                        ││
-│ │ ✅ On track (3)  ⚠️ Near limit (1)  🔴 Over (0)     ││
-│ └──────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 9. PDF Statements Page
+### 9. Settings Page
 
-```
-┌─────────────────────────────────────────────────────────┐
-│ Bank Statements                        [📤 Upload PDF]   │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ 📄 BDO_Statement_June2026.pdf                        ││
-│ │    Bank Statement · Uploaded Jun 25 · ✅ Parsed       ││
-│ │    12 transactions found · [View Results]             ││
-│ ├──────────────────────────────────────────────────────┤│
-│ │ 📄 BPI_CC_May2026.pdf                               ││
-│ │    Credit Card · Uploaded Jun 2 · ✅ Parsed           ││
-│ │    28 transactions found · [View Results]             ││
-│ └──────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────┘
-```
+> **Current implementation:** Three sections: Profile form (first name, last name, currency dropdown), Change Password form (current + new), Account Info (read-only email). Uses direct service calls instead of TanStack Query mutations. Some styling inconsistency (`gray-*` vs `zinc-*`).
 
-**Upload Flow:**
-1. Drag & drop zone or file picker button
-2. Select statement type (bank, credit card, investment)
-3. Optionally link to an account
-4. Upload + parse → show progress spinner
-5. Review parsed transactions in a table (editable — fix amounts, categories, dates)
-6. Confirm → save transactions to selected account
+### 10. Import/Export Pages
 
-### 10. CSV Import Page
+> **Current implementation:**
+> - **Import:** 2-step CSV flow (upload file + select account → preview table → confirm). Works with `importService` directly.
+> - **Export:** Date range picker + 3 format cards (CSV, Excel, PDF). Auto-downloads via blob URL.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│ CSV Import                                               │
-├─────────────────────────────────────────────────────────┤
-│ Step 1 of 3: Upload File                                │
-│                                                         │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │                                                      ││
-│ │       📄 Drag & drop your CSV file here              ││
-│ │          or [Browse Files]                           ││
-│ │                                                      ││
-│ │       Supported: .csv files                          ││
-│ └──────────────────────────────────────────────────────┘│
-│                                                         │
-│ Step 2 of 3: Map Columns                                │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ CSV Column    →    Maps To                           ││
-│ │ "Date"        →    [Transaction Date ▾]              ││
-│ │ "Details"     →    [Description ▾]                   ││
-│ │ "Debit"       →    [Expense Amount ▾]                ││
-│ │ "Credit"      →    [Income Amount ▾]                 ││
-│ │ Preview: first 5 rows shown below                    ││
-│ └──────────────────────────────────────────────────────┘│
-│                                                         │
-│ Step 3 of 3: Review & Confirm                           │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ 45 transactions parsed · 2 possible duplicates       ││
-│ │ [Confirm Import] [Cancel]                            ││
-│ └──────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────┘
-```
+### 11. Auth Pages
 
-### 11. Settings Page
+> **Current implementation:**
+> - **Login:** Email + password, zodResolver validation, server error banner, link to register. Clean centered card on `zinc-50/zinc-950` background.
+> - **Register:** First name, last name, email, password. No Google OAuth button yet. No password strength indicator.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│ Settings                                                 │
-├─────────────────────────────────────────────────────────┤
-│ Profile                                                 │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ [Avatar]  John Doe                                   ││
-│ │           john@example.com                           ││
-│ │           [Edit Profile]                             ││
-│ └──────────────────────────────────────────────────────┘│
-│                                                         │
-│ Preferences                                             │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ Default Currency     [PHP ▾]                         ││
-│ │ Theme               [Light ○] [Dark ○] [System ●]   ││
-│ │ Date Format          [MM/DD/YYYY ▾]                  ││
-│ └──────────────────────────────────────────────────────┘│
-│                                                         │
-│ Data                                                    │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ [📥 Export to Excel]  [📥 Export to PDF]             ││
-│ │ [📤 Import CSV]                                     ││
-│ └──────────────────────────────────────────────────────┘│
-│                                                         │
-│ Subscription                                            │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ Current Plan: Free                                   ││
-│ │ 2/2 accounts used · 38/50 transactions this month    ││
-│ │ [✨ Upgrade to Premium]                              ││
-│ └──────────────────────────────────────────────────────┘│
-│ -or if premium-                                         │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ Current Plan: Premium ⭐                             ││
-│ │ Monthly · Renews Jul 28, 2026                        ││
-│ │ Payment: GCash                                       ││
-│ │ [View Payment History] [Cancel Subscription]         ││
-│ └──────────────────────────────────────────────────────┘│
-│                                                         │
-│ Connected Accounts                                      │
-│ ┌──────────────────────────────────────────────────────┐│
-│ │ Google   john@gmail.com          [Connected ✅]      ││
-│ │ Email    john@example.com        [Change Password]   ││
-│ └──────────────────────────────────────────────────────┘│
-│                                                         │
-│ [Sign Out]                                              │
-└─────────────────────────────────────────────────────────┘
-```
-
-### 12. Pricing / Upgrade Page
-
-```
-┌─────────────────────────────────────────────────────────┐
-│ Upgrade to Premium                                       │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  Unlock the full power of Financial Tracker             │
-│                                                         │
-│ ┌────────────────────────┐ ┌────────────────────────┐   │
-│ │ Free                   │ │ ⭐ Premium             │   │
-│ │                        │ │                        │   │
-│ │ PHP 0                  │ │ PHP ___/mo (web)       │   │
-│ │                        │ │ PHP ___ one-time (app) │   │
-│ │ ✅ 2 accounts          │ │                        │   │
-│ │ ✅ Basic budgets       │ │ ✅ Unlimited accounts   │   │
-│ │ ✅ Dark mode           │ │ ✅ Unlimited transact.  │   │
-│ │ ❌ Investments         │ │ ✅ Investments          │   │
-│ │ ❌ PDF parsing         │ │ ✅ PDF parsing          │   │
-│ │ ❌ Insights            │ │ ✅ Spending insights    │   │
-│ │ ❌ Goals               │ │ ✅ Financial goals      │   │
-│ │ ❌ Bill reminders      │ │ ✅ Bill reminders       │   │
-│ │ ❌ Receipt scan        │ │ ✅ Receipt scanning     │   │
-│ │ ❌ CSV import          │ │ ✅ CSV import           │   │
-│ │ ❌ Data export         │ │ ✅ Excel & PDF export   │   │
-│ │ ❌ Multi-currency      │ │ ✅ Multi-currency       │   │
-│ │ ❌ Search              │ │ ✅ Full-text search     │   │
-│ │ ❌ Image & location    │ │ ✅ Image & location     │   │
-│ │                        │ │                        │   │
-│ │ [Current Plan]         │ │ [✨ Upgrade Now]       │   │
-│ └────────────────────────┘ └────────────────────────┘   │
-│                                                         │
-│ Payment methods: 💳 Card  GCash  Maya  GrabPay          │
-│                  BPI Online  UnionBank                   │
-│                                                         │
-│ Secure payments powered by PayMongo                     │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Upgrade Flow:**
-1. User clicks "Upgrade Now" or hits a premium feature lock
-2. Redirected to Pricing page (or shown a modal on mobile)
-3. Clicks "Upgrade Now" → frontend calls `POST /subscriptions/checkout`
-4. Redirected to PayMongo hosted checkout (selects payment method, enters details)
-5. On success: redirected back to app → subscription activated → features unlocked
-6. On mobile: checkout opens in in-app browser via `expo-web-browser`
-
-**Premium Feature Lock (inline):**
-- When a free user tries to access a premium feature (e.g., clicks "Investments" in sidebar):
-  - Show a lock overlay or modal: "Investments is a Premium feature"
-  - Brief description of the feature
-  - [✨ Upgrade to Premium] CTA button
-  - "See all features" link → Pricing page
-- Navigation items for locked features show a small 🔒 icon
-
-**Dashboard Upgrade CTA (free tier only):**
-- Card on dashboard: "Unlock Premium — Get investments, insights, goals, and more"
-- Dismissable but reappears periodically
-- Uses `premium` gold/yellow accent color
-
-### 13. Auth Pages
-
-**Login:**
-- Email + password fields
+**Missing from auth pages:**
 - "Remember me" checkbox
 - "Forgot password?" link
-- [Sign In] primary button
-- [Sign in with Google] button (Google branded)
-- "Don't have an account? [Sign Up]" link
-- Clean centered card layout
+- Google OAuth sign-in/sign-up button
+- Password strength indicator on register
 
-**Register:**
-- First name + Last name (side by side)
-- Email
-- Password + Confirm password (with strength indicator)
-- [Sign Up] primary button
-- [Sign up with Google] button
-- "Already have an account? [Sign In]" link
+### 12. Pricing / Upgrade Page
+Not yet implemented. Should show Free vs Premium comparison with PayMongo checkout flow.
 
 ---
 
 ## Screens — Mobile App
+
+> **Not yet implemented.** Mobile app initialization (Expo + NativeBase + Drizzle/SQLite + React Navigation) is a future phase.
 
 ### 1. Home Screen (Dashboard)
 
@@ -781,72 +681,26 @@ The main landing page after login. Overview of financial health.
 │ Tags        [+ Add tag      ]│
 │                             │
 │ ┌───────────────────────┐   │
-│ │ 📷 Add Image          │   │  ← Opens camera/gallery picker
-│ │ [image preview here]  │   │  ← Shows thumbnail if image attached
+│ │ 📷 Add Image          │   │
+│ │ [image preview here]  │   │
 │ └───────────────────────┘   │
 │                             │
 │ ┌───────────────────────┐   │
-│ │ 📍 Add Location       │   │  ← Auto-detect or manual entry
-│ │ SM North EDSA, QC     │   │  ← Shows location name if set
+│ │ 📍 Add Location       │   │
+│ │ SM North EDSA, QC     │   │
 │ └───────────────────────┘   │
 │                             │
 │ 🔄 Recurring  [OFF ───●]   │
 │   Interval    [Monthly ▾]   │
 │                             │
-│ [     Save Transaction     ]│  ← Primary button, full width
+│ [     Save Transaction     ]│
 │                             │
 ├─────────────────────────────┤
 │ 🏠   📊    ➕    💰    ⋯   │
 └─────────────────────────────┘
 ```
 
-**Mobile-specific features:**
-- Large amount input at top (numeric keyboard auto-opens)
-- Segmented control for type (not dropdown)
-- "Add Image" button: shows bottom sheet with Camera / Gallery / Receipt Scan options
-- "Add Location" button: auto-detects GPS (with loading spinner), shows detected location name, option to edit/clear
-- Receipt Scan option triggers OCR flow (Step 24 in PLAN.md)
-
-### 3. Transaction Detail Screen
-
-```
-┌─────────────────────────────┐
-│ ←  Transaction Detail  [✏️] │
-├─────────────────────────────┤
-│                             │
-│        -PHP 350.00          │  ← Large centered amount
-│        Expense              │
-│                             │
-│ ┌───────────────────────┐   │
-│ │ 🍔 Food & Dining      │   │
-│ │ Jollibee              │   │
-│ │ BDO Savings           │   │
-│ │ June 28, 2026 12:30PM │   │
-│ └───────────────────────┘   │
-│                             │
-│ 📷 Attached Image           │
-│ ┌───────────────────────┐   │
-│ │                       │   │
-│ │   [Receipt Photo]     │   │  ← Tappable to view full screen
-│ │                       │   │
-│ └───────────────────────┘   │
-│                             │
-│ 📍 Location                 │
-│ SM North EDSA, Quezon City  │
-│ ┌───────────────────────┐   │
-│ │   [Mini Map Preview]  │   │  ← Optional map
-│ └───────────────────────┘   │
-│                             │
-│ Tags: #lunch #work          │
-│                             │
-│ [🗑️ Delete Transaction]     │
-│                             │
-├─────────────────────────────┤
-│ 🏠   📊    ➕    💰    ⋯   │
-└─────────────────────────────┘
-```
-
-### 4. Receipt Scanning Flow (Mobile Only)
+### 3. Receipt Scanning Flow (Mobile Only)
 
 ```
 Screen 1: Camera                Screen 2: Review
@@ -856,25 +710,22 @@ Screen 1: Camera                Screen 2: Review
 │                         │    │                         │
 │   ┌─────────────────┐   │    │ Detected:               │
 │   │                 │   │    │                         │
-│   │                 │   │    │ Amount:  PHP 350.00  ✏️ │
-│   │  Camera Preview │   │    │ Date:    Jun 28, 2026✏️ │
+│   │  Camera Preview │   │    │ Amount:  PHP 350.00  ✏️ │
+│   │                 │   │    │ Date:    Jun 28, 2026✏️ │
 │   │                 │   │    │ Merchant: Jollibee   ✏️ │
-│   │                 │   │    │                         │
-│   └─────────────────┘   │    │ Raw text:               │
-│                         │    │ ┌─────────────────────┐ │
-│   [📸 Capture]          │    │ │ JOLLIBEE            │ │
-│   [🖼️ From Gallery]     │    │ │ SM North EDSA       │ │
-│                         │    │ │ Order #12345        │ │
+│   └─────────────────┘   │    │                         │
+│                         │    │ Raw text:               │
+│   [📸 Capture]          │    │ ┌─────────────────────┐ │
+│   [🖼️ From Gallery]     │    │ │ JOLLIBEE            │ │
+│                         │    │ │ SM North EDSA       │ │
 │                         │    │ │ Total: PHP 350.00   │ │
 │                         │    │ └─────────────────────┘ │
 │                         │    │                         │
 │                         │    │ [Use These Details →]   │
-│                         │    │ (Opens Add Transaction  │
-│                         │    │  with pre-filled data)  │
 └─────────────────────────┘    └─────────────────────────┘
 ```
 
-### 5. More Screen (Tab)
+### 4. More Screen (Tab)
 
 ```
 ┌─────────────────────────────┐
@@ -898,7 +749,7 @@ Screen 1: Camera                Screen 2: Review
 │ └───────────────────────┘   │
 │                             │
 │ ┌───────────────────────┐   │
-│ │ ✨ Upgrade Premium    │   │  ← Gold accent, only shown on free tier
+│ │ ✨ Upgrade Premium    │   │
 │ │ Unlock all features   │   │
 │ └───────────────────────┘   │
 │                             │
@@ -916,40 +767,34 @@ Screen 1: Camera                Screen 2: Review
 └─────────────────────────────┘
 ```
 
-### 6. Sync Status Screen (Mobile Only)
+---
 
-```
-┌─────────────────────────────┐
-│ ←  Sync Status              │
-├─────────────────────────────┤
-│                             │
-│ Last synced: 5 minutes ago  │
-│ Status: ✅ Up to date       │
-│                             │
-│ [🔄 Sync Now]               │
-│                             │
-│ Pending Changes             │
-│ ┌───────────────────────┐   │
-│ │ No pending changes    │   │
-│ │ All data is synced    │   │
-│ └───────────────────────┘   │
-│                             │
-│ -or if pending-             │
-│ ┌───────────────────────┐   │
-│ │ 3 pending changes     │   │
-│ │ · 2 new transactions  │   │
-│ │ · 1 updated account   │   │
-│ │ Will sync when online │   │
-│ └───────────────────────┘   │
-│                             │
-│ Conflicts (if any)          │
-│ ┌───────────────────────┐   │
-│ │ ⚠️ 1 conflict          │   │
-│ │ Transaction "Groceries"│   │
-│ │ [Keep Local] [Keep Srv]│   │
-│ └───────────────────────┘   │
-└─────────────────────────────┘
-```
+## Known Issues & Gaps (Web)
+
+### Styling
+- [ ] Primary color is `blue-600` instead of design system `purple-600`
+- [ ] No shared reusable components (Button, Card, Input, Badge) — all inline Tailwind
+- [ ] Settings page uses `gray-*` inconsistently (should be `zinc-*`)
+- [ ] Sidebar uses text-based pseudo-icons instead of `react-icons`
+- [ ] Sidebar is not collapsible on smaller screens
+- [ ] No top bar with notification bell / user avatar
+
+### Functionality
+- [ ] No Google OAuth button on login/register pages
+- [ ] No toast/notification system for mutation feedback
+- [ ] No search or filters on transactions page
+- [ ] No date grouping on transactions (just a flat table)
+- [ ] Budget progress bars always show 0% (no actual spending calculation)
+- [ ] Insights page shows category UUIDs instead of resolved names
+- [ ] No pagination / infinite scroll on any list page
+- [ ] No edit functionality on most entities (only create/delete)
+- [ ] No transaction detail view
+- [ ] No charts (Recharts not integrated yet)
+- [ ] No premium feature gating UI
+- [ ] No pricing/upgrade page
+- [ ] Empty states are text-only (no icons/illustrations)
+- [ ] Loading states are text-only (no skeletons)
+- [ ] No responsive breakpoints — sidebar is always 256px fixed
 
 ---
 
@@ -993,40 +838,13 @@ Screen 1: Camera                Screen 2: Review
 5. Review all parsed transactions, fix any warnings
 6. Confirm import → transactions created, linked to selected account
 
-### Flow 6: View Transaction with Image & Location
-1. From transaction list, tap a transaction that has 📷 and 📍 indicators
-2. Detail screen shows full transaction info
-3. Image shown as preview (tap to view full-screen with pinch-to-zoom)
-4. Location shown as text + optional map preview
-5. On web: image opens in lightbox, location shows embedded map
-
-### Flow 7: Free User Hits Premium Feature Lock
+### Flow 6: Free User Hits Premium Feature Lock
 1. Free user taps "Investments" in navigation (shows 🔒 icon)
 2. Lock screen/modal appears: "Investments is a Premium feature"
 3. Shows brief description + feature highlights
 4. [Upgrade to Premium] button → opens Pricing page
 5. User selects plan → redirected to PayMongo checkout
 6. Completes payment → redirected back → feature now unlocked
-7. 🔒 icons disappear from nav, limits removed
-
-### Flow 8: Web Monthly Subscription
-1. User on free tier clicks "Upgrade" in Settings or Dashboard CTA
-2. Pricing page shows Free vs Premium comparison
-3. Clicks "Upgrade Now" → `POST /subscriptions/checkout` → PayMongo checkout URL
-4. Browser redirects to PayMongo hosted payment page
-5. User selects payment method (card, GCash, Maya, etc.) and pays
-6. PayMongo redirects to success URL → app shows "Welcome to Premium!"
-7. Webhook confirms payment → backend activates subscription
-8. Monthly auto-renewal handled by PayMongo → webhook extends period each cycle
-
-### Flow 9: Mobile One-Time Purchase
-1. User taps "Upgrade Premium" in More tab
-2. Pricing screen shows features + one-time price
-3. Taps "Purchase" → `POST /subscriptions/checkout` → PayMongo checkout URL
-4. In-app browser opens PayMongo payment page (`expo-web-browser`)
-5. User pays → browser redirects to deep link / success URL
-6. App detects successful payment → "Premium Unlocked!"
-7. Webhook confirms payment → backend sets subscription to `active` (no expiry)
 
 ---
 
@@ -1045,24 +863,28 @@ Screen 1: Camera                Screen 2: Review
 - Modals become full-screen on mobile breakpoints
 - Sidebar: hidden (sm) → icon-only (lg) → full (xl)
 
+> **Current state:** No responsive breakpoints implemented. Sidebar is always 256px fixed. Content doesn't adapt to screen size.
+
 ---
 
 ## Dark Mode Design Notes
 
 ### Color Mapping
 - Backgrounds: light gray → dark gray (not pure black, easier on eyes)
-- Cards: white → gray.700
-- Text: gray.800 → gray.50
-- Borders: gray.200 → gray.600
+- Cards: white → zinc-800
+- Text: zinc-900 → zinc-50
+- Borders: zinc-200 → zinc-700
 - Primary color: adjusts to lighter shade for dark backgrounds
 - Charts: use brighter/lighter color variants in dark mode
 
 ### Implementation
-- All colors reference semantic tokens, never hardcoded hex
-- `neutral.bg`, `neutral.card`, `neutral.text`, `neutral.border` switch per mode
-- Status colors (success/danger/warning) use lighter variants in dark mode
-- Shadows removed in dark mode, replaced with borders
-- Charts and graphs adapt their color palette
+- `ThemeProvider` component toggles `dark` class on `<html>` element
+- Tailwind `dark:` variant used on all styled elements
+- User preference stored in Zustand `useAppStore` (persisted to localStorage)
+- Three modes: Light / Dark / System (follows `prefers-color-scheme`)
+- Theme cycle button in sidebar footer
+
+> **Current state:** Dark mode is functional. The `ThemeProvider` correctly applies/removes the `dark` class. Most pages use `dark:bg-zinc-*` and `dark:text-zinc-*` variants. System mode listens to `matchMedia` changes.
 
 ---
 
@@ -1089,6 +911,8 @@ Screen 1: Camera                Screen 2: Review
 - Pull-to-refresh: custom spinner with sync icon
 - Skeleton loading: shimmer animation (1.5s loop)
 - No excessive animations — keep it professional and fast-feeling
+
+> **Current state:** No animations or transitions implemented. All page changes and state updates are instant.
 
 ---
 
