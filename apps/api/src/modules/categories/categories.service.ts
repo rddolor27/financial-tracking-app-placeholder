@@ -2,6 +2,8 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  Inject,
+  type Provider,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
@@ -9,6 +11,7 @@ import { Category } from './category.entity';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { CategoryModel } from './models/category.model';
+import { CATEGORIES_SERVICE } from './categories.constants';
 
 @Injectable()
 export class CategoriesService {
@@ -94,3 +97,11 @@ export class CategoriesService {
     await this.categoriesRepo.remove(category);
   }
 }
+
+export const InjectCategoriesService = (): PropertyDecorator &
+  ParameterDecorator => Inject(CATEGORIES_SERVICE);
+
+export const CategoriesProvider: Provider = {
+  provide: CATEGORIES_SERVICE,
+  useClass: CategoriesService,
+};

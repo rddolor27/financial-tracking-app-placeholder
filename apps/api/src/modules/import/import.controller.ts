@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import type { ImportService } from './import.service';
-import { InjectImportService } from './import.providers';
+import { InjectImportService } from './import.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CsvPreviewDto } from './dtos/csv-preview.dto';
 import { CsvConfirmDto } from './dtos/csv-confirm.dto';

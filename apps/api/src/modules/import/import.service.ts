@@ -1,8 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Inject, Injectable, BadRequestException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from '../transactions/transaction.entity';
 import { Account } from '../accounts/account.entity';
+import { IMPORT_SERVICE } from './import.constants';
 
 export interface CsvRow {
   date: string;
@@ -108,3 +109,11 @@ export class ImportService {
     return { imported };
   }
 }
+
+export const InjectImportService = (): PropertyDecorator &
+  ParameterDecorator => Inject(IMPORT_SERVICE);
+
+export const ImportProvider: Provider = {
+  provide: IMPORT_SERVICE,
+  useClass: ImportService,
+};

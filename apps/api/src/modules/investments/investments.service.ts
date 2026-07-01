@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Investment } from './investment.entity';
@@ -8,6 +8,7 @@ import { UpdateInvestmentDto } from './dtos/update-investment.dto';
 import { CreateInvestmentTransactionDto } from './dtos/create-investment-transaction.dto';
 import { InvestmentModel } from './models/investment.model';
 import { InvestmentTransactionModel } from './models/investment-transaction.model';
+import { INVESTMENTS_SERVICE } from './investments.constants';
 
 @Injectable()
 export class InvestmentsService {
@@ -98,3 +99,11 @@ export class InvestmentsService {
     return InvestmentTransactionModel.fromEntity(saved);
   }
 }
+
+export const InjectInvestmentsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(INVESTMENTS_SERVICE);
+
+export const InvestmentsProvider: Provider = {
+  provide: INVESTMENTS_SERVICE,
+  useClass: InvestmentsService,
+};

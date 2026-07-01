@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ExportService } from './export.service';
 import { Transaction } from '../transactions/transaction.entity';
 import { EXPORT_SERVICE } from './export.constants';
-import { ExportProvider } from './export.providers';
+import { ExportProvider } from './export.service';
 
 const mockRepo = () => ({
   find: jest.fn(),

@@ -5,7 +5,7 @@ import { BillReminder } from './bill-reminder.entity';
 import { Notification } from '../notifications/notification.entity';
 import { Transaction } from '../transactions/transaction.entity';
 import { BILL_REMINDERS_CRON_SERVICE } from './bill-reminders.constants';
-import { BillRemindersCronProvider } from './bill-reminders.providers';
+import { BillRemindersCronProvider } from './bill-reminders-cron.service';
 
 const mockBillsRepo = () => ({
   find: jest.fn(),

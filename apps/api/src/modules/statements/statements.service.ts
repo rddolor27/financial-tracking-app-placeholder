@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Statement } from './statement.entity';
 import { StatementModel } from './models/statement.model';
+import { STATEMENTS_SERVICE } from './statements.constants';
 
 @Injectable()
 export class StatementsService {
@@ -63,3 +64,11 @@ export class StatementsService {
     await this.statementsRepo.remove(statement);
   }
 }
+
+export const InjectStatementsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(STATEMENTS_SERVICE);
+
+export const StatementsProvider: Provider = {
+  provide: STATEMENTS_SERVICE,
+  useClass: StatementsService,
+};

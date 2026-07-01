@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import type { UsersService } from './users.service';
-import { InjectUsersService } from './users.providers';
+import { InjectUsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';

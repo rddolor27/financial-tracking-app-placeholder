@@ -1,6 +1,6 @@
 import { Controller, Get, Query, UseGuards, Req } from '@nestjs/common';
 import type { InsightsService } from './insights.service';
-import { InjectInsightsService } from './insights.providers';
+import { InjectInsightsService } from './insights.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { InsightsQueryDto } from './dtos/insights-query.dto';
 

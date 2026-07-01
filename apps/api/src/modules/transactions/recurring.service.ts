@@ -1,8 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThanOrEqual } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Transaction } from './transaction.entity';
+import { RECURRING_SERVICE } from './transactions.constants';
 
 @Injectable()
 export class RecurringService {
@@ -75,3 +76,11 @@ export class RecurringService {
     return date.toISOString().split('T')[0];
   }
 }
+
+export const InjectRecurringService = (): PropertyDecorator &
+  ParameterDecorator => Inject(RECURRING_SERVICE);
+
+export const RecurringProvider: Provider = {
+  provide: RECURRING_SERVICE,
+  useClass: RecurringService,
+};

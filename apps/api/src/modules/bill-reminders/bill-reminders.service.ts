@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BillReminder } from './bill-reminder.entity';
 import { CreateBillReminderDto } from './dtos/create-bill-reminder.dto';
 import { UpdateBillReminderDto } from './dtos/update-bill-reminder.dto';
 import { BillReminderModel } from './models/bill-reminder.model';
+import { BILL_REMINDERS_SERVICE } from './bill-reminders.constants';
 
 @Injectable()
 export class BillRemindersService {
@@ -50,3 +51,11 @@ export class BillRemindersService {
     await this.billRemindersRepo.remove(reminder);
   }
 }
+
+export const InjectBillRemindersService = (): PropertyDecorator &
+  ParameterDecorator => Inject(BILL_REMINDERS_SERVICE);
+
+export const BillRemindersProvider: Provider = {
+  provide: BILL_REMINDERS_SERVICE,
+  useClass: BillRemindersService,
+};

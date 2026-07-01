@@ -4,7 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { BillRemindersService } from './bill-reminders.service';
 import { BillReminder } from './bill-reminder.entity';
 import { BILL_REMINDERS_SERVICE } from './bill-reminders.constants';
-import { BillRemindersProvider } from './bill-reminders.providers';
+import { BillRemindersProvider } from './bill-reminders.service';
 
 const mockRepository = () => ({
   find: jest.fn(),

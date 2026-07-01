@@ -4,7 +4,7 @@ import { ImportService } from './import.service';
 import { Transaction } from '../transactions/transaction.entity';
 import { Account } from '../accounts/account.entity';
 import { IMPORT_SERVICE } from './import.constants';
-import { ImportProvider } from './import.providers';
+import { ImportProvider } from './import.service';
 
 const mockRepo = () => ({
   find: jest.fn(),

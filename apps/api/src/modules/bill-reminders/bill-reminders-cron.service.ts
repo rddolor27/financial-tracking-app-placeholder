@@ -1,10 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { BillReminder } from './bill-reminder.entity';
 import { Notification } from '../notifications/notification.entity';
 import { Transaction } from '../transactions/transaction.entity';
+import { BILL_REMINDERS_CRON_SERVICE } from './bill-reminders.constants';
 
 @Injectable()
 export class BillRemindersCronService {
@@ -85,3 +86,11 @@ export class BillRemindersCronService {
     return -1;
   }
 }
+
+export const InjectBillRemindersCronService = (): PropertyDecorator &
+  ParameterDecorator => Inject(BILL_REMINDERS_CRON_SERVICE);
+
+export const BillRemindersCronProvider: Provider = {
+  provide: BILL_REMINDERS_CRON_SERVICE,
+  useClass: BillRemindersCronService,
+};

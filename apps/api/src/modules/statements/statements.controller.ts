@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { StatementsService } from './statements.service';
-import { InjectStatementsService } from './statements.providers';
+import { InjectStatementsService } from './statements.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { StatementModel } from './models/statement.model';
 

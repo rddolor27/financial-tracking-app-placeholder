@@ -6,7 +6,7 @@ import { SubscriptionPlan } from './subscription-plan.entity';
 import { Subscription } from './subscription.entity';
 import { Payment } from './payment.entity';
 import { SUBSCRIPTIONS_SERVICE } from './subscriptions.constants';
-import { SubscriptionsProvider } from './subscriptions.providers';
+import { SubscriptionsProvider } from './subscriptions.service';
 
 const mockRepo = () => ({
   find: jest.fn(),

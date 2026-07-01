@@ -6,7 +6,7 @@ import { Category } from '../categories/category.entity';
 import { Transaction } from '../transactions/transaction.entity';
 import { Budget } from '../budgets/budget.entity';
 import { SYNC_SERVICE } from './sync.constants';
-import { SyncProvider } from './sync.providers';
+import { SyncProvider } from './sync.service';
 
 const mockRepo = () => ({
   find: jest.fn(),

@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import type { ExchangeRatesService } from './exchange-rates.service';
-import { InjectExchangeRatesService } from './exchange-rates.providers';
+import { InjectExchangeRatesService } from './exchange-rates.service';
 import { ExchangeRateModel } from './models/exchange-rate.model';
 
 @Controller('exchange-rates')

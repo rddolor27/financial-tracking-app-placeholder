@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Transaction } from '../transactions/transaction.entity';
+import { INSIGHTS_SERVICE } from './insights.constants';
 
 export interface SpendingByCategory {
   category_id: string;
@@ -75,3 +76,11 @@ export class InsightsService {
     return { income, expense, savings: income - expense, rate: Math.round(rate * 100) / 100 };
   }
 }
+
+export const InjectInsightsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(INSIGHTS_SERVICE);
+
+export const InsightsProvider: Provider = {
+  provide: INSIGHTS_SERVICE,
+  useClass: InsightsService,
+};

@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Transaction } from '../transactions/transaction.entity';
 import * as ExcelJS from 'exceljs';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { EXPORT_SERVICE } from './export.constants';
 
 export interface ExportData {
   transactions: Array<{
@@ -161,3 +162,11 @@ export class ExportService {
     return Buffer.from(doc.output('arraybuffer'));
   }
 }
+
+export const InjectExportService = (): PropertyDecorator &
+  ParameterDecorator => Inject(EXPORT_SERVICE);
+
+export const ExportProvider: Provider = {
+  provide: EXPORT_SERVICE,
+  useClass: ExportService,
+};

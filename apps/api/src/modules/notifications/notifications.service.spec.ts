@@ -4,7 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { Notification } from './notification.entity';
 import { NOTIFICATIONS_SERVICE } from './notifications.constants';
-import { NotificationsProvider } from './notifications.providers';
+import { NotificationsProvider } from './notifications.service';
 
 const mockRepository = () => ({
   find: jest.fn(),

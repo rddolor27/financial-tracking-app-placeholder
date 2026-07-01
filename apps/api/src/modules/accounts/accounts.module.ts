@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from './account.entity';
 import { AccountsController } from './accounts.controller';
-import { AccountsProvider } from './accounts.providers';
+import { AccountsProvider } from './accounts.service';
 import { ACCOUNTS_SERVICE } from './accounts.constants';
 
 @Module({

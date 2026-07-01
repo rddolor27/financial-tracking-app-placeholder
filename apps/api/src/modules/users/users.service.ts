@@ -3,12 +3,15 @@ import {
   ConflictException,
   NotFoundException,
   BadRequestException,
+  Inject,
+  type Provider,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { UserModel } from './models/user.model';
+import { USERS_SERVICE } from './users.constants';
 
 @Injectable()
 export class UsersService {
@@ -76,3 +79,11 @@ export class UsersService {
     await this.usersRepo.save(user);
   }
 }
+
+export const InjectUsersService = (): PropertyDecorator &
+  ParameterDecorator => Inject(USERS_SERVICE);
+
+export const UsersProvider: Provider = {
+  provide: USERS_SERVICE,
+  useClass: UsersService,
+};

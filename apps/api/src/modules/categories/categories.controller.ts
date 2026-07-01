@@ -12,7 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import type { CategoriesService } from './categories.service';
-import { InjectCategoriesService } from './categories.providers';
+import { InjectCategoriesService } from './categories.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';

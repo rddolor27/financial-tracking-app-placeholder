@@ -1,9 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ExchangeRate } from './exchange-rate.entity';
 import { ExchangeRateModel } from './models/exchange-rate.model';
+import { EXCHANGE_RATES_SERVICE } from './exchange-rates.constants';
 
 @Injectable()
 export class ExchangeRatesService {
@@ -77,3 +78,11 @@ export class ExchangeRatesService {
     }
   }
 }
+
+export const InjectExchangeRatesService = (): PropertyDecorator &
+  ParameterDecorator => Inject(EXCHANGE_RATES_SERVICE);
+
+export const ExchangeRatesProvider: Provider = {
+  provide: EXCHANGE_RATES_SERVICE,
+  useClass: ExchangeRatesService,
+};

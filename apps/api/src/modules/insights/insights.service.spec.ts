@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { InsightsService } from './insights.service';
 import { Transaction } from '../transactions/transaction.entity';
 import { INSIGHTS_SERVICE } from './insights.constants';
-import { InsightsProvider } from './insights.providers';
+import { InsightsProvider } from './insights.service';
 
 const mockRepo = () => ({
   find: jest.fn(),

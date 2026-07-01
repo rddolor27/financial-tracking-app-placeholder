@@ -4,7 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { Goal } from './goal.entity';
 import { GOALS_SERVICE } from './goals.constants';
-import { GoalsProvider } from './goals.providers';
+import { GoalsProvider } from './goals.service';
 
 const mockRepository = () => ({
   find: jest.fn(),

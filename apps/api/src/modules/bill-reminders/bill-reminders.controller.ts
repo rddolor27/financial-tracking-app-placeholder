@@ -3,7 +3,7 @@ import {
   UseGuards, Req, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import type { BillRemindersService } from './bill-reminders.service';
-import { InjectBillRemindersService } from './bill-reminders.providers';
+import { InjectBillRemindersService } from './bill-reminders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateBillReminderDto } from './dtos/create-bill-reminder.dto';
 import { UpdateBillReminderDto } from './dtos/update-bill-reminder.dto';

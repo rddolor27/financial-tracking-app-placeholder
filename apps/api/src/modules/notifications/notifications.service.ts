@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from './notification.entity';
 import { NotificationModel } from './models/notification.model';
+import { NOTIFICATIONS_SERVICE } from './notifications.constants';
 
 @Injectable()
 export class NotificationsService {
@@ -51,3 +52,11 @@ export class NotificationsService {
     );
   }
 }
+
+export const InjectNotificationsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(NOTIFICATIONS_SERVICE);
+
+export const NotificationsProvider: Provider = {
+  provide: NOTIFICATIONS_SERVICE,
+  useClass: NotificationsService,
+};

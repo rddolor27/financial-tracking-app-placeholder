@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, UseGuards, Req, Delete } from '@nestjs/common';
 import type { SubscriptionsService } from './subscriptions.service';
-import { InjectSubscriptionsService } from './subscriptions.providers';
+import { InjectSubscriptionsService } from './subscriptions.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CheckoutRequestDto } from './dtos/checkout-request.dto';
 import { SubscriptionModel } from './models/subscription.model';

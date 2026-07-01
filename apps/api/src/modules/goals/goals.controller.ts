@@ -3,7 +3,7 @@ import {
   UseGuards, Req, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import type { GoalsService } from './goals.service';
-import { InjectGoalsService } from './goals.providers';
+import { InjectGoalsService } from './goals.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateGoalDto } from './dtos/create-goal.dto';
 import { UpdateGoalDto } from './dtos/update-goal.dto';

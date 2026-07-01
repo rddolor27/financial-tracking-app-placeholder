@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Budget } from './budget.entity';
 import { CreateBudgetDto } from './dtos/create-budget.dto';
 import { UpdateBudgetDto } from './dtos/update-budget.dto';
 import { BudgetModel } from './models/budget.model';
+import { BUDGETS_SERVICE } from './budgets.constants';
 
 @Injectable()
 export class BudgetsService {
@@ -58,3 +59,11 @@ export class BudgetsService {
     await this.budgetsRepo.remove(budget);
   }
 }
+
+export const InjectBudgetsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(BUDGETS_SERVICE);
+
+export const BudgetsProvider: Provider = {
+  provide: BUDGETS_SERVICE,
+  useClass: BudgetsService,
+};

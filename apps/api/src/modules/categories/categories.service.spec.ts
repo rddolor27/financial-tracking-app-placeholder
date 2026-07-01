@@ -4,7 +4,7 @@ import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { Category } from './category.entity';
 import { CATEGORIES_SERVICE } from './categories.constants';
-import { CategoriesProvider } from './categories.providers';
+import { CategoriesProvider } from './categories.service';
 
 const mockRepository = () => ({
   find: jest.fn(),

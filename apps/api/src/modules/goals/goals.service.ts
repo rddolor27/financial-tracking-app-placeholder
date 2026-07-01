@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Goal } from './goal.entity';
 import { CreateGoalDto } from './dtos/create-goal.dto';
 import { UpdateGoalDto } from './dtos/update-goal.dto';
 import { GoalModel } from './models/goal.model';
+import { GOALS_SERVICE } from './goals.constants';
 
 @Injectable()
 export class GoalsService {
@@ -60,3 +61,11 @@ export class GoalsService {
     await this.goalsRepo.remove(goal);
   }
 }
+
+export const InjectGoalsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(GOALS_SERVICE);
+
+export const GoalsProvider: Provider = {
+  provide: GOALS_SERVICE,
+  useClass: GoalsService,
+};

@@ -6,7 +6,7 @@ import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { USERS_SERVICE } from './users.constants';
-import { UsersProvider } from './users.providers';
+import { UsersProvider } from './users.service';
 
 const mockRepository = () => ({
   findOne: jest.fn(),

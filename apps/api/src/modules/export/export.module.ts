@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExportController } from './export.controller';
-import { ExportProvider } from './export.providers';
+import { ExportProvider } from './export.service';
 import { Transaction } from '../transactions/transaction.entity';
 
 @Module({

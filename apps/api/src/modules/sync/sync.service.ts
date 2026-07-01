@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import { Account } from '../accounts/account.entity';
 import { Category } from '../categories/category.entity';
 import { Transaction } from '../transactions/transaction.entity';
 import { Budget } from '../budgets/budget.entity';
+import { SYNC_SERVICE } from './sync.constants';
 
 export interface SyncPullResult {
   accounts: Account[];
@@ -105,3 +106,11 @@ export class SyncService {
     return map[entityType] || null;
   }
 }
+
+export const InjectSyncService = (): PropertyDecorator &
+  ParameterDecorator => Inject(SYNC_SERVICE);
+
+export const SyncProvider: Provider = {
+  provide: SYNC_SERVICE,
+  useClass: SyncService,
+};

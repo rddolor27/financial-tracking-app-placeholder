@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { RecurringService } from './recurring.service';
 import { Transaction } from './transaction.entity';
 import { RECURRING_SERVICE } from './transactions.constants';
-import { RecurringProvider } from './transactions.providers';
+import { RecurringProvider } from './recurring.service';
 
 const mockRepository = () => ({
   find: jest.fn(),

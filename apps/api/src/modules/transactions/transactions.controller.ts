@@ -13,7 +13,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import type { TransactionsService } from './transactions.service';
-import { InjectTransactionsService } from './transactions.providers';
+import { InjectTransactionsService } from './transactions.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { UpdateTransactionDto } from './dtos/update-transaction.dto';

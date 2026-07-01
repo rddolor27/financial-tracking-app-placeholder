@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Body, Query, UseGuards, Req } from '@nestjs/common';
 import type { SyncService } from './sync.service';
-import { InjectSyncService } from './sync.providers';
+import { InjectSyncService } from './sync.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { SyncPushDto } from './dtos/sync-push.dto';
 

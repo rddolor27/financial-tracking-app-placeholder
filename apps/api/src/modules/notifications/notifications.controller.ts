@@ -3,7 +3,7 @@ import {
   UseGuards, Req, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import type { NotificationsService } from './notifications.service';
-import { InjectNotificationsService } from './notifications.providers';
+import { InjectNotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { NotificationModel } from './models/notification.model';
 

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SyncController } from './sync.controller';
-import { SyncProvider } from './sync.providers';
+import { SyncProvider } from './sync.service';
 import { Account } from '../accounts/account.entity';
 import { Category } from '../categories/category.entity';
 import { Transaction } from '../transactions/transaction.entity';

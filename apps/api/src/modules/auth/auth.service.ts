@@ -1,12 +1,13 @@
 import { randomUUID } from 'crypto';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException, type Provider } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { AUTH_SERVICE } from './auth.constants';
 import type { UsersService } from '../users/users.service';
-import { InjectUsersService } from '../users/users.providers';
+import { InjectUsersService } from '../users/users.service';
 import { RefreshToken } from './refresh-token.entity';
 import { User } from '../users/user.entity';
 import { RegisterDto } from './dtos/register.dto';
@@ -182,3 +183,11 @@ export class AuthService {
     };
   }
 }
+
+export const InjectAuthService = (): PropertyDecorator &
+  ParameterDecorator => Inject(AUTH_SERVICE);
+
+export const AuthProvider: Provider = {
+  provide: AUTH_SERVICE,
+  useClass: AuthService,
+};

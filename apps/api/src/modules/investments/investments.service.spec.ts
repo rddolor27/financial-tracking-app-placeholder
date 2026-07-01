@@ -5,7 +5,7 @@ import { InvestmentsService } from './investments.service';
 import { Investment } from './investment.entity';
 import { InvestmentTransaction } from './investment-transaction.entity';
 import { INVESTMENTS_SERVICE } from './investments.constants';
-import { InvestmentsProvider } from './investments.providers';
+import { InvestmentsProvider } from './investments.service';
 
 const mockRepository = () => ({
   find: jest.fn(),

@@ -1,7 +1,7 @@
 import { Controller, Get, Query, UseGuards, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 import type { ExportService } from './export.service';
-import { InjectExportService } from './export.providers';
+import { InjectExportService } from './export.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ExportQueryDto } from './dtos/export-query.dto';
 

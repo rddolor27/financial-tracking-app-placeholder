@@ -12,7 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import type { BudgetsService } from './budgets.service';
-import { InjectBudgetsService } from './budgets.providers';
+import { InjectBudgetsService } from './budgets.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateBudgetDto } from './dtos/create-budget.dto';
 import { UpdateBudgetDto } from './dtos/update-budget.dto';

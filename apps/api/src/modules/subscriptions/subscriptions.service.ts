@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, BadRequestException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubscriptionPlan } from './subscription-plan.entity';
@@ -6,6 +6,7 @@ import { Subscription } from './subscription.entity';
 import { Payment } from './payment.entity';
 import { SubscriptionModel } from './models/subscription.model';
 import { SubscriptionPlanModel } from './models/subscription-plan.model';
+import { SUBSCRIPTIONS_SERVICE } from './subscriptions.constants';
 
 @Injectable()
 export class SubscriptionsService {
@@ -133,3 +134,11 @@ export class SubscriptionsService {
     });
   }
 }
+
+export const InjectSubscriptionsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(SUBSCRIPTIONS_SERVICE);
+
+export const SubscriptionsProvider: Provider = {
+  provide: SUBSCRIPTIONS_SERVICE,
+  useClass: SubscriptionsService,
+};

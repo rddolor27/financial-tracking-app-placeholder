@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { SubscriptionsService } from './subscriptions.service';
-import { InjectSubscriptionsService } from './subscriptions.providers';
+import { InjectSubscriptionsService } from './subscriptions.service';
 
 export const REQUIRED_FEATURE_KEY = 'required_feature';
 

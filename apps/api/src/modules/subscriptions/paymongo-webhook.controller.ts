@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Headers, HttpCode, HttpStatus, Logger, RawBodyRequest, Req } from '@nestjs/common';
 import type { SubscriptionsService } from './subscriptions.service';
-import { InjectSubscriptionsService } from './subscriptions.providers';
+import { InjectSubscriptionsService } from './subscriptions.service';
 import * as crypto from 'crypto';
 import { Request } from 'express';
 

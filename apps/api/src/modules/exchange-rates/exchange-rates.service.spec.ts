@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ExchangeRatesService } from './exchange-rates.service';
 import { ExchangeRate } from './exchange-rate.entity';
 import { EXCHANGE_RATES_SERVICE } from './exchange-rates.constants';
-import { ExchangeRatesProvider } from './exchange-rates.providers';
+import { ExchangeRatesProvider } from './exchange-rates.service';
 
 const mockRepo = () => ({
   find: jest.fn(),

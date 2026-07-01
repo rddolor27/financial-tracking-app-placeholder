@@ -5,7 +5,7 @@ import { PayMongoWebhookController } from './paymongo-webhook.controller';
 import { SubscriptionPlan } from './subscription-plan.entity';
 import { Subscription } from './subscription.entity';
 import { Payment } from './payment.entity';
-import { SubscriptionsProvider } from './subscriptions.providers';
+import { SubscriptionsProvider } from './subscriptions.service';
 import { SUBSCRIPTIONS_SERVICE } from './subscriptions.constants';
 import { SubscriptionGuard } from './subscription.guard';
 

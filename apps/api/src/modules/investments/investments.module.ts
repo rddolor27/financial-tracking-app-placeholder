@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Investment } from './investment.entity';
 import { InvestmentTransaction } from './investment-transaction.entity';
 import { InvestmentsController } from './investments.controller';
-import { InvestmentsProvider } from './investments.providers';
+import { InvestmentsProvider } from './investments.service';
 import { INVESTMENTS_SERVICE } from './investments.constants';
 
 @Module({

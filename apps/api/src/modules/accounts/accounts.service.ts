@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account } from './account.entity';
 import { CreateAccountDto } from './dtos/create-account.dto';
 import { UpdateAccountDto } from './dtos/update-account.dto';
 import { AccountModel } from './models/account.model';
+import { ACCOUNTS_SERVICE } from './accounts.constants';
 
 @Injectable()
 export class AccountsService {
@@ -59,3 +60,11 @@ export class AccountsService {
     await this.accountsRepo.save(account);
   }
 }
+
+export const InjectAccountsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(ACCOUNTS_SERVICE);
+
+export const AccountsProvider: Provider = {
+  provide: ACCOUNTS_SERVICE,
+  useClass: AccountsService,
+};

@@ -12,7 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import type { InvestmentsService } from './investments.service';
-import { InjectInvestmentsService } from './investments.providers';
+import { InjectInvestmentsService } from './investments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateInvestmentDto } from './dtos/create-investment.dto';
 import { UpdateInvestmentDto } from './dtos/update-investment.dto';

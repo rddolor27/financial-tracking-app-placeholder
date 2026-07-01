@@ -4,7 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { Account } from './account.entity';
 import { ACCOUNTS_SERVICE } from './accounts.constants';
-import { AccountsProvider } from './accounts.providers';
+import { AccountsProvider } from './accounts.service';
 
 const mockRepository = () => ({
   find: jest.fn(),

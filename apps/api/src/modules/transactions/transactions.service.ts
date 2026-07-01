@@ -1,12 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, type Provider } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import type { AccountsService } from '../accounts/accounts.service';
-import { InjectAccountsService } from '../accounts/accounts.providers';
+import { InjectAccountsService } from '../accounts/accounts.service';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { UpdateTransactionDto } from './dtos/update-transaction.dto';
 import { TransactionModel } from './models/transaction.model';
+import { TRANSACTIONS_SERVICE } from './transactions.constants';
 
 @Injectable()
 export class TransactionsService {
@@ -160,3 +161,11 @@ export class TransactionsService {
     await this.txRepo.remove(tx);
   }
 }
+
+export const InjectTransactionsService = (): PropertyDecorator &
+  ParameterDecorator => Inject(TRANSACTIONS_SERVICE);
+
+export const TransactionsProvider: Provider = {
+  provide: TRANSACTIONS_SERVICE,
+  useClass: TransactionsService,
+};

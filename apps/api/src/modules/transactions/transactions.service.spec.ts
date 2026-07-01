@@ -4,7 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { Transaction } from './transaction.entity';
 import { TRANSACTIONS_SERVICE } from './transactions.constants';
-import { TransactionsProvider } from './transactions.providers';
+import { TransactionsProvider } from './transactions.service';
 import { ACCOUNTS_SERVICE } from '../accounts/accounts.constants';
 
 const mockRepository = () => ({

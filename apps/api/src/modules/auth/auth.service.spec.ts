@@ -7,7 +7,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { AUTH_SERVICE } from './auth.constants';
-import { AuthProvider } from './auth.providers';
+import { AuthProvider } from './auth.service';
 import { USERS_SERVICE } from '../users/users.constants';
 import { RefreshToken } from './refresh-token.entity';
 import type { User } from '../users/user.entity';
