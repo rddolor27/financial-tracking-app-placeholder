@@ -1,5 +1,12 @@
+import { join } from 'path';
+import { config } from 'dotenv';
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
+
+// Load env-specific file first (.dev.env), then fall back to .env
+const env = process.env.NODE_ENV || 'development';
+config({ path: join(__dirname, '..', 'config', `.${env}.env`) });
+config({ path: join(__dirname, '..', 'config', '.env') });
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',

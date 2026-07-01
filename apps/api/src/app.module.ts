@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -28,7 +29,10 @@ import { ExportModule } from './modules/export/export.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env'],
+      envFilePath: [
+        join(__dirname, 'config', `.${process.env.NODE_ENV || 'development'}.env`),
+        join(__dirname, 'config', '.env'),
+      ],
     }),
     TypeOrmModule.forRoot({
       ...dataSourceOptions,
