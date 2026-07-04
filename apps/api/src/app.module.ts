@@ -30,8 +30,8 @@ import { ExportModule } from './modules/export/export.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
-        join(__dirname, 'config', `.${process.env.NODE_ENV || 'development'}.env`),
-        join(__dirname, 'config', '.env'),
+        join(process.cwd(), 'src', 'config', `.${process.env.NODE_ENV || 'development'}.env`),
+        join(process.cwd(), 'src', 'config', '.env'),
       ],
     }),
     TypeOrmModule.forRoot({
