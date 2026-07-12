@@ -39,7 +39,7 @@ describe('Sidebar', () => {
     expect(screen.getByText('Categories')).toBeTruthy();
     expect(screen.getByText('Investments')).toBeTruthy();
     expect(screen.getByText('Goals')).toBeTruthy();
-    expect(screen.getByText('Bill Reminders')).toBeTruthy();
+    expect(screen.getByText('Bills')).toBeTruthy();
     expect(screen.getByText('Insights')).toBeTruthy();
     expect(screen.getByText('Export')).toBeTruthy();
     expect(screen.getByText('Import CSV')).toBeTruthy();
@@ -53,11 +53,11 @@ describe('Sidebar', () => {
 
   it('should render Sign Out button', () => {
     render(<Sidebar />);
-    expect(screen.getByText('Sign Out')).toBeTruthy();
+    expect(screen.getByTitle('Sign out')).toBeTruthy();
   });
 
   it('should render theme toggle', () => {
     render(<Sidebar />);
-    expect(screen.getByText('Theme: Light')).toBeTruthy();
+    expect(screen.getByTitle('Theme: Light')).toBeTruthy();
   });
 });
