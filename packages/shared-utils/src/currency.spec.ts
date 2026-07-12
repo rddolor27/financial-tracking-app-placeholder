@@ -1,4 +1,4 @@
-import { formatCurrency, convertCurrency, parseCurrencyAmount } from './currency';
+import { formatCurrency, convertCurrency, parseCurrencyAmount, money } from './currency';
 
 describe('formatCurrency', () => {
   it('should format PHP currency', () => {
@@ -48,6 +48,28 @@ describe('convertCurrency', () => {
   it('should convert EUR to PHP', () => {
     const result = convertCurrency(100, 'EUR', 'PHP', rates);
     expect(result).toBe(6141);
+  });
+});
+
+describe('money', () => {
+  it('prefixes the PHP symbol and groups thousands', () => {
+    expect(money(248530)).toBe('₱248,530');
+  });
+
+  it('preserves decimals when present', () => {
+    expect(money(248530.75)).toBe('₱248,530.75');
+  });
+
+  it('uses the symbol for a given currency', () => {
+    expect(money(1200, 'USD')).toBe('$1,200');
+  });
+
+  it('renders the raw value (callers pass Math.abs and add their own sign)', () => {
+    expect(money(-500)).toBe('₱-500');
+  });
+
+  it('formats zero', () => {
+    expect(money(0)).toBe('₱0');
   });
 });
 

@@ -53,3 +53,13 @@ export function parseCurrencyAmount(value: string): number | null {
 export function getCurrencySymbol(currency: string): string {
   return CURRENCY_SYMBOLS[currency] || currency;
 }
+
+/**
+ * Compact money formatter used by the UI (matches the design handoff `money()`):
+ * currency symbol + locale-grouped number, preserving any decimals.
+ * Callers apply their own sign/color (e.g. `+`/`−`) around it.
+ */
+export function money(amount: number, currency = 'PHP'): string {
+  const symbol = CURRENCY_SYMBOLS[currency] || currency;
+  return symbol + amount.toLocaleString('en-US');
+}
