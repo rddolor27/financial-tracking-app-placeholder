@@ -41,4 +41,18 @@ describe('createApiClient', () => {
     const client = createApiClient({ baseURL: 'http://localhost:3000/api' });
     expect(client.interceptors.response.use).toHaveBeenCalled();
   });
+
+  it('defaults withCredentials to false', () => {
+    createApiClient({ baseURL: 'http://localhost:3000/api' });
+    expect(axios.create).toHaveBeenCalledWith(
+      expect.objectContaining({ withCredentials: false }),
+    );
+  });
+
+  it('enables withCredentials when requested (cookie auth)', () => {
+    createApiClient({ baseURL: 'http://localhost:3000/api', withCredentials: true });
+    expect(axios.create).toHaveBeenCalledWith(
+      expect.objectContaining({ withCredentials: true }),
+    );
+  });
 });

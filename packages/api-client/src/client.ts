@@ -3,6 +3,8 @@ import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 export interface ApiClientConfig {
   baseURL: string;
+  /** Send cookies with cross-origin requests (web httpOnly-cookie auth). */
+  withCredentials?: boolean;
   getAccessToken?: () => string | null;
   onRefreshToken?: (refreshToken: string) => Promise<{ access_token: string; refresh_token: string }>;
   getRefreshToken?: () => string | null;
@@ -14,6 +16,7 @@ export function createApiClient(config: ApiClientConfig): AxiosInstance {
   const instance = axios.create({
     baseURL: config.baseURL,
     timeout: 30000,
+    withCredentials: config.withCredentials ?? false,
     headers: {
       'Content-Type': 'application/json',
     },
