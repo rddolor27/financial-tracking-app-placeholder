@@ -11,7 +11,12 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.enableCors();
+  // credentials:true is required so browsers send/receive the httpOnly auth
+  // cookies; the origin must be explicit (cannot be "*") when credentials are on.
+  app.enableCors({
+    origin: process.env.WEB_ORIGIN ?? 'http://localhost:3000',
+    credentials: true,
+  });
 
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
