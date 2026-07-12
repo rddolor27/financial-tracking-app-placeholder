@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateBillReminderSchema } from '@financial-tracker/shared-types';
 import type { BillReminder } from '@financial-tracker/shared-types';
+import { FiPlus, FiTrash2, FiClock } from 'react-icons/fi';
 import { useBillReminders, useCreateBillReminder, useDeleteBillReminder } from '@/lib/crud-hooks';
-import { formatCurrency } from '@financial-tracker/shared-utils';
+import { money } from '@financial-tracker/shared-utils';
+import { Card, Chip, IconBox, EmptyState } from '@/components/ui';
 
 type BillForm = {
   name: string;
@@ -47,126 +49,109 @@ export default function BillsPage() {
   };
 
   const billsList: BillReminder[] = bills ?? [];
+  const today = new Date().getDate();
+  const upcomingTotal = useMemo(
+    () => billsList.filter((b) => b.is_active).reduce((s, b) => s + b.amount, 0),
+    [billsList],
+  );
+
+  const inputCls =
+    'w-full px-3 py-2 rounded-[10px] bg-canvas border border-line text-[13px] text-ink focus:outline-none focus:border-primary';
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Bill Reminders</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
-        >
-          {showForm ? 'Cancel' : 'Add Bill'}
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center">
+        <div>
+          <div className="font-bold text-[16px]">Bill reminders</div>
+          <div className="text-[12px] text-faint mt-0.5">{money(upcomingTotal)} across active bills</div>
+        </div>
+        <div className="flex-1" />
+        <button onClick={() => setShowForm((v) => !v)} className="btn-p">
+          <FiPlus className="w-4 h-4" /> {showForm ? 'Cancel' : 'Add bill'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 mb-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+        <Card>
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Bill Name</label>
-                <input
-                  {...register('name')}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="e.g. Netflix, Electric Bill"
-                />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                <label className="block text-[12px] font-semibold text-muted mb-1">Bill name</label>
+                <input {...register('name')} className={inputCls} placeholder="e.g. Netflix, Electric Bill" />
+                {errors.name && <p className="text-loss text-[12px] mt-1">{errors.name.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Amount</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  {...register('amount', { valueAsNumber: true })}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-                {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount.message}</p>}
+                <label className="block text-[12px] font-semibold text-muted mb-1">Amount</label>
+                <input type="number" step="0.01" {...register('amount', { valueAsNumber: true })} className={inputCls} />
+                {errors.amount && <p className="text-loss text-[12px] mt-1">{errors.amount.message}</p>}
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Due Day</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="31"
-                  {...register('due_day', { valueAsNumber: true })}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-                {errors.due_day && <p className="text-red-500 text-sm mt-1">{errors.due_day.message}</p>}
+                <label className="block text-[12px] font-semibold text-muted mb-1">Due day</label>
+                <input type="number" min="1" max="31" {...register('due_day', { valueAsNumber: true })} className={inputCls} />
+                {errors.due_day && <p className="text-loss text-[12px] mt-1">{errors.due_day.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Frequency</label>
-                <select
-                  {...register('frequency')}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
+                <label className="block text-[12px] font-semibold text-muted mb-1">Frequency</label>
+                <select {...register('frequency')} className={inputCls}>
                   {FREQUENCIES.map((f) => (
                     <option key={f.value} value={f.value}>{f.label}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Remind Days Before</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="30"
-                  {...register('reminder_days_before', { valueAsNumber: true })}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
+                <label className="block text-[12px] font-semibold text-muted mb-1">Remind days before</label>
+                <input type="number" min="0" max="30" {...register('reminder_days_before', { valueAsNumber: true })} className={inputCls} />
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" {...register('auto_create_transaction')} id="auto_create" />
-              <label htmlFor="auto_create" className="text-sm">Auto-create transaction on due date</label>
-            </div>
-            <button
-              type="submit"
-              disabled={createMutation.isPending}
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 text-sm font-medium"
-            >
-              {createMutation.isPending ? 'Creating...' : 'Create Bill Reminder'}
+            <label className="flex items-center gap-2 text-[13px]">
+              <input type="checkbox" {...register('auto_create_transaction')} />
+              Auto-create transaction on due date
+            </label>
+            <button type="submit" disabled={createMutation.isPending} className="btn-p self-start disabled:opacity-50">
+              {createMutation.isPending ? 'Creating…' : 'Create bill reminder'}
             </button>
           </form>
-        </div>
+        </Card>
       )}
 
       {isLoading ? (
-        <p className="text-zinc-500">Loading bills...</p>
+        <Card><EmptyState>Loading bills…</EmptyState></Card>
       ) : billsList.length === 0 ? (
-        <p className="text-zinc-500">No bill reminders yet. Add one to stay on top of payments.</p>
+        <Card><EmptyState>No bill reminders yet. Add one to stay on top of payments.</EmptyState></Card>
       ) : (
-        <div className="space-y-3">
-          {billsList.map((bill) => (
-            <div
-              key={bill.id}
-              className="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center justify-between"
-            >
-              <div>
-                <h3 className="font-semibold">{bill.name}</h3>
-                <p className="text-sm text-zinc-500">
-                  {formatCurrency(bill.amount, bill.currency)} &middot; Due day {bill.due_day} &middot; {bill.frequency}
-                </p>
-                <div className="flex gap-2 mt-1">
-                  {bill.auto_create_transaction && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Auto-create</span>
-                  )}
-                  {!bill.is_active && (
-                    <span className="text-xs bg-zinc-100 text-zinc-500 px-2 py-0.5 rounded-full">Inactive</span>
-                  )}
+        <Card>
+          {billsList.map((bill) => {
+            const due = bill.due_day <= today;
+            return (
+              <div key={bill.id} className="flex items-center gap-3 py-[11px] border-b border-line2 last:border-none">
+                <IconBox bg="var(--primary-tint)" color="var(--primary-light)">
+                  <FiClock className="w-4 h-4" />
+                </IconBox>
+                <div className="min-w-0">
+                  <div className="font-semibold text-[13px] truncate">{bill.name}</div>
+                  <div className="text-[11px] text-faint mt-0.5">
+                    {bill.frequency} · due day {bill.due_day}
+                    {bill.auto_create_transaction ? ' · auto-create' : ''}
+                  </div>
                 </div>
+                <div className="flex-1" />
+                <div className="mono text-[13.5px] mr-3">{money(bill.amount, bill.currency)}</div>
+                <Chip variant={!bill.is_active ? 'vio' : due ? 'down' : 'vio'}>
+                  {!bill.is_active ? 'Inactive' : due ? 'Due now' : 'Upcoming'}
+                </Chip>
+                <button
+                  onClick={() => deleteMutation.mutate(bill.id)}
+                  title="Delete"
+                  className="ml-3 text-faint hover:text-loss transition-colors"
+                >
+                  <FiTrash2 className="w-4 h-4" />
+                </button>
               </div>
-              <button
-                onClick={() => deleteMutation.mutate(bill.id)}
-                className="text-sm text-red-500 hover:text-red-700"
-              >
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
+            );
+          })}
+        </Card>
       )}
     </div>
   );

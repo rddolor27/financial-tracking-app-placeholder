@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '@financial-tracker/store';
 import { usersService } from '@/lib/api';
+import { Card } from '@/components/ui';
 
 export default function SettingsPage() {
   const user = useAuthStore((s) => s.user);
@@ -53,97 +54,77 @@ export default function SettingsPage() {
     }
   };
 
+  const inputCls =
+    'w-full px-3 py-2 rounded-[10px] bg-canvas border border-line text-[13px] text-ink focus:outline-none focus:border-primary';
+  const labelCls = 'block text-[12px] font-semibold text-muted mb-1';
+
   return (
-    <div className="space-y-6 max-w-2xl">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
-
-      <form onSubmit={handleUpdateProfile} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Profile</h2>
-
-        <div>
-          <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">First Name</label>
-          <input
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="border rounded px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Last Name</label>
-          <input
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="border rounded px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Default Currency</label>
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            className="border rounded px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          >
-            <option value="PHP">PHP - Philippine Peso</option>
-            <option value="USD">USD - US Dollar</option>
-            <option value="EUR">EUR - Euro</option>
-            <option value="GBP">GBP - British Pound</option>
-            <option value="JPY">JPY - Japanese Yen</option>
-          </select>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button
-            type="submit"
-            disabled={profileLoading}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {profileLoading ? 'Saving...' : 'Save Profile'}
-          </button>
-          {profileMsg && <span className="text-sm text-gray-600 dark:text-gray-400">{profileMsg}</span>}
-        </div>
-      </form>
-
-      <form onSubmit={handleChangePassword} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Change Password</h2>
-
-        <div>
-          <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Current Password</label>
-          <input
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="border rounded px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">New Password</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="border rounded px-3 py-2 w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button
-            type="submit"
-            disabled={passwordLoading || !currentPassword || !newPassword}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {passwordLoading ? 'Changing...' : 'Change Password'}
-          </button>
-          {passwordMsg && <span className="text-sm text-gray-600 dark:text-gray-400">{passwordMsg}</span>}
-        </div>
-      </form>
-
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Account Info</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Email: {user?.email}</p>
+    <div className="flex flex-col gap-4 max-w-2xl">
+      <div>
+        <div className="font-bold text-[16px]">Settings</div>
+        <div className="text-[12px] text-faint mt-0.5">Profile &amp; preferences</div>
       </div>
+
+      <Card>
+        <form onSubmit={handleUpdateProfile} className="flex flex-col gap-4">
+          <div className="font-bold text-[14.5px]">Profile</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>First name</label>
+              <input value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Last name</label>
+              <input value={lastName} onChange={(e) => setLastName(e.target.value)} className={inputCls} />
+            </div>
+          </div>
+          <div>
+            <label className={labelCls}>Default currency</label>
+            <select value={currency} onChange={(e) => setCurrency(e.target.value)} className={inputCls}>
+              <option value="PHP">PHP - Philippine Peso</option>
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="GBP">GBP - British Pound</option>
+              <option value="JPY">JPY - Japanese Yen</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-4">
+            <button type="submit" disabled={profileLoading} className="btn-p disabled:opacity-50">
+              {profileLoading ? 'Saving…' : 'Save profile'}
+            </button>
+            {profileMsg && <span className="text-[12px] text-faint">{profileMsg}</span>}
+          </div>
+        </form>
+      </Card>
+
+      <Card>
+        <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
+          <div className="font-bold text-[14.5px]">Change password</div>
+          <div>
+            <label className={labelCls}>Current password</label>
+            <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>New password</label>
+            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputCls} />
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              type="submit"
+              disabled={passwordLoading || !currentPassword || !newPassword}
+              className="btn-p disabled:opacity-50"
+            >
+              {passwordLoading ? 'Changing…' : 'Change password'}
+            </button>
+            {passwordMsg && <span className="text-[12px] text-faint">{passwordMsg}</span>}
+          </div>
+        </form>
+      </Card>
+
+      <Card>
+        <div className="font-bold text-[14.5px] mb-2">Account info</div>
+        <p className="text-[13px] text-muted">Email: {user?.email}</p>
+      </Card>
     </div>
   );
 }

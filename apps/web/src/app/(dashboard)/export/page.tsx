@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { FiFileText, FiGrid, FiFile } from 'react-icons/fi';
 import { exportService } from '@/lib/api';
+import { Card } from '@/components/ui';
 
 export default function ExportPage() {
   const [startDate, setStartDate] = useState(() => {
@@ -40,64 +42,55 @@ export default function ExportPage() {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Export Transactions</h1>
+  const inputCls =
+    'px-3 py-2 rounded-[10px] bg-canvas border border-line text-[13px] text-ink focus:outline-none focus:border-primary';
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Date Range</h2>
-        <div className="flex gap-4">
-          <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Start Date</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">End Date</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
-          </div>
-        </div>
+  const formats = [
+    { key: 'csv' as const, icon: FiFileText, title: 'CSV', desc: 'Spreadsheet-compatible format' },
+    { key: 'excel' as const, icon: FiGrid, title: 'Excel', desc: 'Styled workbook with summary' },
+    { key: 'pdf' as const, icon: FiFile, title: 'PDF', desc: 'Printable transaction report' },
+  ];
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <div className="font-bold text-[16px]">Export transactions</div>
+        <div className="text-[12px] text-faint mt-0.5">Download your data</div>
       </div>
 
+      <Card>
+        <div className="font-bold text-[14.5px] mb-3.5">Date range</div>
+        <div className="flex flex-wrap gap-4">
+          <div>
+            <label className="block text-[12px] font-semibold text-muted mb-1">Start date</label>
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className="block text-[12px] font-semibold text-muted mb-1">End date</label>
+            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={inputCls} />
+          </div>
+        </div>
+      </Card>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button
-          onClick={() => download('csv')}
-          disabled={!!loading}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-left hover:ring-2 ring-blue-500 transition disabled:opacity-50"
-        >
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">CSV</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Spreadsheet-compatible format</p>
-          {loading === 'csv' && <p className="text-sm text-blue-500 mt-2">Downloading...</p>}
-        </button>
-
-        <button
-          onClick={() => download('excel')}
-          disabled={!!loading}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-left hover:ring-2 ring-green-500 transition disabled:opacity-50"
-        >
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Excel</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Styled workbook with summary</p>
-          {loading === 'excel' && <p className="text-sm text-green-500 mt-2">Downloading...</p>}
-        </button>
-
-        <button
-          onClick={() => download('pdf')}
-          disabled={!!loading}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-left hover:ring-2 ring-red-500 transition disabled:opacity-50"
-        >
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">PDF</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Printable transaction report</p>
-          {loading === 'pdf' && <p className="text-sm text-red-500 mt-2">Downloading...</p>}
-        </button>
+        {formats.map(({ key, icon: Icon, title, desc }) => (
+          <button
+            key={key}
+            onClick={() => download(key)}
+            disabled={!!loading}
+            className="card pad text-left hover:border-primary transition-colors disabled:opacity-50"
+          >
+            <div
+              className="w-[38px] h-[38px] rounded-[11px] flex items-center justify-center mb-3"
+              style={{ background: 'var(--primary-tint)', color: 'var(--primary-light)' }}
+            >
+              <Icon className="w-4 h-4" />
+            </div>
+            <div className="font-bold text-[14.5px]">{title}</div>
+            <p className="text-[12px] text-faint mt-1">{desc}</p>
+            {loading === key && <p className="text-[12px] text-primary-light mt-2">Downloading…</p>}
+          </button>
+        ))}
       </div>
     </div>
   );

@@ -1,12 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateBudgetSchema } from '@financial-tracker/shared-types';
 import type { BudgetResponse } from '@financial-tracker/shared-types';
-import { useBudgets, useCreateBudget, useDeleteBudget, useCategories } from '@/lib/crud-hooks';
-import { formatCurrency } from '@financial-tracker/shared-utils';
+import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import {
+  useBudgets,
+  useCreateBudget,
+  useDeleteBudget,
+  useCategories,
+  useSpendingByCategory,
+} from '@/lib/crud-hooks';
+import { money } from '@financial-tracker/shared-utils';
+import { Card, Chip, ProgressBar, EmptyState } from '@/components/ui';
 
 type BudgetForm = {
   category_id: string;
@@ -16,15 +24,57 @@ type BudgetForm = {
   alert_threshold?: number;
 };
 
+const monthRange = () => {
+  const now = new Date();
+  return {
+    start: new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0],
+    end: now.toISOString().split('T')[0],
+  };
+};
+
+const chipVariant = (pct: number) => (pct >= 100 ? 'down' : pct > 80 ? 'amb' : 'up');
+const barColor = (pct: number) => (pct >= 100 ? 'var(--red)' : pct > 80 ? 'var(--amber)' : 'var(--green)');
+
 export default function BudgetsPage() {
+  const { start, end } = monthRange();
   const { data: budgetsData, isLoading } = useBudgets();
   const { data: categories = [] } = useCategories();
+  const { data: spending } = useSpendingByCategory(start, end);
   const createMutation = useCreateBudget();
   const deleteMutation = useDeleteBudget();
   const [showForm, setShowForm] = useState(false);
 
   const budgets: BudgetResponse[] = budgetsData?.data ?? [];
-  const expenseCategories = (categories as Array<{ id: string; name: string; type: string }>).filter((c) => c.type === 'expense');
+  const catMap = useMemo(() => {
+    const m = new Map<string, { name: string; type: string }>();
+    (categories as Array<{ id: string; name: string; type: string }>).forEach((c) =>
+      m.set(c.id, { name: c.name, type: c.type }),
+    );
+    return m;
+  }, [categories]);
+  const spentByCat = useMemo(() => {
+    const m = new Map<string, number>();
+    (spending ?? []).forEach((s) => m.set(s.category_id, Number(s.total)));
+    return m;
+  }, [spending]);
+
+  const expenseCategories = (categories as Array<{ id: string; name: string; type: string }>).filter(
+    (c) => c.type === 'expense',
+  );
+
+  const rows = useMemo(
+    () =>
+      budgets.map((b) => {
+        const spent = spentByCat.get(b.category_id) ?? 0;
+        const limit = Number(b.amount);
+        const pct = limit > 0 ? Math.round((spent / limit) * 100) : 0;
+        return { budget: b, name: catMap.get(b.category_id)?.name ?? 'Budget', spent, limit, pct };
+      }),
+    [budgets, spentByCat, catMap],
+  );
+
+  const totalSpent = rows.reduce((s, r) => s + r.spent, 0);
+  const totalLimit = rows.reduce((s, r) => s + r.limit, 0);
 
   const {
     register,
@@ -46,96 +96,89 @@ export default function BudgetsPage() {
     setShowForm(false);
   };
 
+  const inputCls =
+    'w-full px-3 py-2 rounded-[10px] bg-canvas border border-line text-[13px] text-ink focus:outline-none focus:border-primary';
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Budgets</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-        >
-          {showForm ? 'Cancel' : 'Add Budget'}
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center">
+        <div>
+          <div className="font-bold text-[16px]">Monthly budgets</div>
+          <div className="text-[12px] text-faint mt-0.5">
+            {money(totalSpent)} of {money(totalLimit)} spent
+          </div>
+        </div>
+        <div className="flex-1" />
+        <button onClick={() => setShowForm((v) => !v)} className="btn-p">
+          <FiPlus className="w-4 h-4" /> {showForm ? 'Cancel' : 'New budget'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 mb-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
+        <Card>
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
-                <select
-                  {...register('category_id')}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+                <label className="block text-[12px] font-semibold text-muted mb-1">Category</label>
+                <select {...register('category_id')} className={inputCls}>
                   <option value="">Select category</option>
                   {expenseCategories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
-                {errors.category_id && <p className="text-red-500 text-sm mt-1">{errors.category_id.message}</p>}
+                {errors.category_id && <p className="text-loss text-[12px] mt-1">{errors.category_id.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Amount</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  {...register('amount', { valueAsNumber: true })}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount.message}</p>}
+                <label className="block text-[12px] font-semibold text-muted mb-1">Amount</label>
+                <input type="number" step="0.01" {...register('amount', { valueAsNumber: true })} className={inputCls} />
+                {errors.amount && <p className="text-loss text-[12px] mt-1">{errors.amount.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Period</label>
-                <select
-                  {...register('period')}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+                <label className="block text-[12px] font-semibold text-muted mb-1">Period</label>
+                <select {...register('period')} className={inputCls}>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                   <option value="yearly">Yearly</option>
                 </select>
               </div>
             </div>
-            <button
-              type="submit"
-              disabled={createMutation.isPending}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
-            >
-              {createMutation.isPending ? 'Creating...' : 'Create Budget'}
+            <button type="submit" disabled={createMutation.isPending} className="btn-p self-start disabled:opacity-50">
+              {createMutation.isPending ? 'Creating…' : 'Create budget'}
             </button>
           </form>
-        </div>
+        </Card>
       )}
 
       {isLoading ? (
-        <p className="text-zinc-500">Loading budgets...</p>
-      ) : budgets.length === 0 ? (
-        <p className="text-zinc-500">No budgets yet. Create one to track your spending.</p>
+        <Card><EmptyState>Loading budgets…</EmptyState></Card>
+      ) : rows.length === 0 ? (
+        <Card><EmptyState>No budgets yet. Create one to track your spending.</EmptyState></Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {budgets.map((budget) => (
-            <div
-              key={budget.id}
-              className="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-zinc-200 dark:border-zinc-800"
-            >
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs text-zinc-500 uppercase">{budget.period}</span>
-                <button
-                  onClick={() => deleteMutation.mutate(budget.id)}
-                  className="text-sm text-red-500 hover:text-red-700"
-                >
-                  Delete
-                </button>
-              </div>
-              <p className="text-xl font-bold">{formatCurrency(budget.amount, 'PHP')}</p>
-              <div className="mt-3">
-                <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-600 rounded-full" style={{ width: '0%' }} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {rows.map(({ budget, name, spent, limit, pct }) => (
+            <Card key={budget.id}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="font-bold text-[13.5px]">{name}</div>
+                <div className="flex items-center gap-2">
+                  <Chip variant={chipVariant(pct)}>{pct}%</Chip>
+                  <button
+                    onClick={() => deleteMutation.mutate(budget.id)}
+                    title="Delete"
+                    className="text-faint hover:text-loss transition-colors"
+                  >
+                    <FiTrash2 className="w-4 h-4" />
+                  </button>
                 </div>
-                <p className="text-xs text-zinc-500 mt-1">Alert at {Math.round(budget.alert_threshold * 100)}%</p>
               </div>
-            </div>
+              <div className="flex items-baseline gap-1.5 mb-3">
+                <span className="mono text-[20px]">{money(spent)}</span>
+                <span className="text-[12px] text-faint">/ {money(limit)}</span>
+              </div>
+              <ProgressBar pct={pct} color={barColor(pct)} height={9} />
+              <div className="text-[11px] text-faint mt-2.5">
+                {pct >= 100 ? 'Over budget' : `${money(Math.max(0, limit - spent))} remaining`} · {budget.period}
+              </div>
+            </Card>
           ))}
         </div>
       )}
