@@ -13,7 +13,7 @@ interface AppState {
 }
 
 export const appStore = createStore<AppState>((set) => ({
-  themeMode: 'system',
+  themeMode: 'dark',
   sidebarOpen: true,
   selectedDateRange: null,
   setThemeMode: (mode) => set({ themeMode: mode }),

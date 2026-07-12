@@ -1,8 +1,8 @@
 import { useAppStore } from './use-app-store';
 
 describe('useAppStore', () => {
-  it('should default to system theme', () => {
-    expect(useAppStore.getState().themeMode).toBe('system');
+  it('should default to dark theme', () => {
+    expect(useAppStore.getState().themeMode).toBe('dark');
   });
 
   it('should toggle sidebar', () => {
