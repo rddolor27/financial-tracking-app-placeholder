@@ -1,7 +1,9 @@
 import React from 'react';
+import { Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuthStore } from '@financial-tracker/store';
+import { useThemeColors } from '../lib/use-theme';
 import { HomeScreen } from '../screens/home-screen';
 import { AccountsScreen } from '../screens/accounts-screen';
 import { TransactionsScreen } from '../screens/transactions-screen';
@@ -47,20 +49,38 @@ function AuthNavigator() {
   );
 }
 
+const TAB_GLYPHS: Record<string, string> = {
+  Home: '◧',
+  Accounts: '▦',
+  Transactions: '⇄',
+  Budgets: '◔',
+  Settings: '⚙',
+};
+
 function TabNavigator() {
+  const { colors } = useThemeColors();
   return (
     <MainTab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: '#2563EB',
-        tabBarInactiveTintColor: '#999',
-        tabBarStyle: { paddingBottom: 4, height: 56 },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '500' },
-      }}
+        tabBarActiveTintColor: colors.primaryLight,
+        tabBarInactiveTintColor: colors.faint,
+        tabBarStyle: {
+          paddingBottom: 6,
+          paddingTop: 6,
+          height: 62,
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
+        },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarIcon: ({ color }) => (
+          <Text style={{ color, fontSize: 18 }}>{TAB_GLYPHS[route.name] ?? '•'}</Text>
+        ),
+      })}
     >
       <MainTab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Home' }} />
       <MainTab.Screen name="Accounts" component={AccountsScreen} options={{ tabBarLabel: 'Accounts' }} />
-      <MainTab.Screen name="Transactions" component={TransactionsScreen} options={{ tabBarLabel: 'Transactions' }} />
+      <MainTab.Screen name="Transactions" component={TransactionsScreen} options={{ tabBarLabel: 'Activity' }} />
       <MainTab.Screen name="Budgets" component={BudgetsScreen} options={{ tabBarLabel: 'Budgets' }} />
       <MainTab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Settings' }} />
     </MainTab.Navigator>

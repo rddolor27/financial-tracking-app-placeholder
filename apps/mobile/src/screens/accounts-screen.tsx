@@ -10,12 +10,14 @@ import {
 } from 'react-native';
 import type { AccountResponse } from '@financial-tracker/shared-types';
 import { useAccounts, useCreateAccount, useDeleteAccount } from '../lib/crud-hooks';
-import { formatCurrency } from '@financial-tracker/shared-utils';
+import { money } from '@financial-tracker/shared-utils';
+import { useThemeColors } from '../lib/use-theme';
 
 export function AccountsScreen() {
   const { data: accountsData, isLoading, refetch } = useAccounts();
   const createMutation = useCreateAccount();
   const deleteMutation = useDeleteAccount();
+  const { colors } = useThemeColors();
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [bankName, setBankName] = useState('');
@@ -30,7 +32,7 @@ export function AccountsScreen() {
       bank_name: bankName.trim() || null,
       balance: 0,
       currency: 'PHP',
-      color: '#4A90D9',
+      color: '#3b82f6',
       icon: 'fa-wallet',
     });
     setName('');
@@ -45,52 +47,62 @@ export function AccountsScreen() {
     ]);
   };
 
-  const renderItem = ({ item }: { item: AccountResponse }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onLongPress={() => handleDelete(item.id, item.name)}
-    >
-      <View style={[styles.dot, { backgroundColor: item.color }]} />
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.name}</Text>
-        {item.bank_name ? <Text style={styles.cardSub}>{item.bank_name}</Text> : null}
-        <Text style={styles.cardAmount}>{formatCurrency(item.balance, item.currency)}</Text>
-      </View>
-      <Text style={styles.cardType}>{item.type.replace('_', ' ')}</Text>
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item }: { item: AccountResponse }) => {
+    const negative = Number(item.balance) < 0 || item.type === 'credit_card' || item.type === 'loan';
+    return (
+      <TouchableOpacity
+        style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
+        onLongPress={() => handleDelete(item.id, item.name)}
+      >
+        <View style={[styles.iconBox, { backgroundColor: colors.primaryTint }]}>
+          <Text style={{ color: item.color || colors.primaryLight, fontWeight: '800' }}>
+            {item.name[0]?.toUpperCase() ?? '•'}
+          </Text>
+        </View>
+        <View style={styles.cardContent}>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>{item.name}</Text>
+          <Text style={[styles.cardSub, { color: colors.faint }]}>
+            {item.type.replace('_', ' ')}{item.bank_name ? ` · ${item.bank_name}` : ''}
+          </Text>
+          <Text style={[styles.cardAmount, { color: negative ? colors.danger : colors.text }]}>
+            {Number(item.balance) < 0 ? '−' : ''}{money(Math.abs(Number(item.balance)), item.currency)}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Accounts</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Accounts</Text>
         <TouchableOpacity onPress={() => setShowForm(!showForm)}>
-          <Text style={styles.addBtn}>{showForm ? 'Cancel' : '+ Add'}</Text>
+          <Text style={[styles.addBtn, { color: colors.primaryLight }]}>{showForm ? 'Cancel' : '+ Add'}</Text>
         </TouchableOpacity>
       </View>
 
       {showForm && (
-        <View style={styles.form}>
+        <View style={[styles.form, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { borderColor: colors.border, color: colors.text }]}
             placeholder="Account name"
+            placeholderTextColor={colors.faint}
             value={name}
             onChangeText={setName}
           />
           <TextInput
-            style={styles.input}
+            style={[styles.input, { borderColor: colors.border, color: colors.text }]}
             placeholder="Bank name (optional)"
+            placeholderTextColor={colors.faint}
             value={bankName}
             onChangeText={setBankName}
           />
           <TouchableOpacity
-            style={styles.submitBtn}
+            style={[styles.submitBtn, { backgroundColor: colors.primary }]}
             onPress={handleCreate}
             disabled={createMutation.isPending}
           >
-            <Text style={styles.submitText}>
-              {createMutation.isPending ? 'Creating...' : 'Create'}
-            </Text>
+            <Text style={styles.submitText}>{createMutation.isPending ? 'Creating…' : 'Create'}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -102,7 +114,7 @@ export function AccountsScreen() {
         refreshing={isLoading}
         onRefresh={refetch}
         ListEmptyComponent={
-          <Text style={styles.empty}>No accounts yet. Tap + Add to create one.</Text>
+          <Text style={[styles.empty, { color: colors.textSecondary }]}>No accounts yet. Tap + Add to create one.</Text>
         }
       />
     </View>
@@ -110,20 +122,19 @@ export function AccountsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5', paddingTop: 60 },
+  container: { flex: 1, paddingTop: 60 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 16 },
-  title: { fontSize: 28, fontWeight: 'bold' },
-  addBtn: { fontSize: 16, color: '#2563EB', fontWeight: '600' },
-  form: { backgroundColor: '#fff', marginHorizontal: 20, borderRadius: 12, padding: 16, marginBottom: 16 },
-  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, marginBottom: 12, fontSize: 16 },
-  submitBtn: { backgroundColor: '#2563EB', borderRadius: 8, padding: 14, alignItems: 'center' },
-  submitText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  card: { backgroundColor: '#fff', marginHorizontal: 20, marginBottom: 8, borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center' },
-  dot: { width: 12, height: 12, borderRadius: 6, marginRight: 12 },
+  title: { fontSize: 24, fontWeight: '800' },
+  addBtn: { fontSize: 15, fontWeight: '700' },
+  form: { marginHorizontal: 20, borderRadius: 16, borderWidth: 1, padding: 16, marginBottom: 16 },
+  input: { borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 12, fontSize: 15 },
+  submitBtn: { borderRadius: 10, padding: 14, alignItems: 'center' },
+  submitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  card: { marginHorizontal: 20, marginBottom: 10, borderRadius: 16, borderWidth: 1, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconBox: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   cardContent: { flex: 1 },
-  cardTitle: { fontSize: 16, fontWeight: '600' },
-  cardSub: { fontSize: 13, color: '#666', marginTop: 2 },
-  cardAmount: { fontSize: 18, fontWeight: '700', marginTop: 4 },
-  cardType: { fontSize: 12, color: '#999', textTransform: 'uppercase' },
-  empty: { textAlign: 'center', color: '#999', marginTop: 40, fontSize: 15 },
+  cardTitle: { fontSize: 15, fontWeight: '700' },
+  cardSub: { fontSize: 12, marginTop: 2, textTransform: 'capitalize' },
+  cardAmount: { fontSize: 20, fontWeight: '700', marginTop: 6 },
+  empty: { textAlign: 'center', marginTop: 40, fontSize: 15 },
 });

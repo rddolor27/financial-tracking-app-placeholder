@@ -18,8 +18,8 @@ describe('useThemeColors', () => {
     mockSystemScheme = 'light';
     const { isDark, colors } = useThemeColors();
     expect(isDark).toBe(false);
-    expect(colors.background).toBe('#f5f5f5');
-    expect(colors.text).toBe('#18181b');
+    expect(colors.background).toBe('#f6f7fb');
+    expect(colors.text).toBe('#1a1725');
   });
 
   it('should return dark colors when themeMode is dark', () => {
@@ -27,8 +27,8 @@ describe('useThemeColors', () => {
     mockSystemScheme = 'light';
     const { isDark, colors } = useThemeColors();
     expect(isDark).toBe(true);
-    expect(colors.background).toBe('#18181b');
-    expect(colors.text).toBe('#f4f4f5');
+    expect(colors.background).toBe('#0a080f');
+    expect(colors.text).toBe('#ece9f6');
   });
 
   it('should follow system scheme when themeMode is system', () => {
@@ -45,13 +45,17 @@ describe('useThemeColors', () => {
     expect(isDark).toBe(false);
   });
 
-  it('should have consistent primary, danger, and success colors', () => {
+  it('keeps the brand primary consistent across themes and defines gain/loss per theme', () => {
     mockThemeMode = 'light';
     const { colors: lightColors } = useThemeColors();
     mockThemeMode = 'dark';
     const { colors: darkColors } = useThemeColors();
+    // Brand accent is the same blue in both themes.
     expect(lightColors.primary).toBe(darkColors.primary);
-    expect(lightColors.danger).toBe(darkColors.danger);
-    expect(lightColors.success).toBe(darkColors.success);
+    // Positive/negative hues are tuned per theme for contrast, so both are defined.
+    expect(lightColors.success).toBeTruthy();
+    expect(darkColors.success).toBeTruthy();
+    expect(lightColors.danger).toBeTruthy();
+    expect(darkColors.danger).toBeTruthy();
   });
 });
