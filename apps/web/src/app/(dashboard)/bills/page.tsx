@@ -48,7 +48,7 @@ export default function BillsPage() {
     setShowForm(false);
   };
 
-  const billsList: BillReminder[] = bills ?? [];
+  const billsList: BillReminder[] = useMemo(() => bills ?? [], [bills]);
   const today = new Date().getDate();
   const upcomingTotal = useMemo(
     () => billsList.filter((b) => b.is_active).reduce((s, b) => s + b.amount, 0),

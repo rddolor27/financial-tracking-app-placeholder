@@ -29,27 +29,26 @@ export function Donut({
   const r = 54;
   const c = 2 * Math.PI * r;
   const total = segments.reduce((s, seg) => s + seg.value, 0) || 1;
-  let offset = 0;
+  const lengths = segments.map((seg) => (seg.value / total) * c);
+  // Offset of each wedge = sum of the lengths that precede it (no mutation).
+  const offsets = lengths.map((_, i) =>
+    lengths.slice(0, i).reduce((sum, len) => sum + len, 0),
+  );
 
   return (
     <svg width={size} height={size} viewBox="0 0 160 160">
       <g transform="rotate(-90 80 80)" fill="none" strokeWidth={18}>
-        {segments.map((seg, i) => {
-          const len = (seg.value / total) * c;
-          const el = (
-            <circle
-              key={i}
-              cx={80}
-              cy={80}
-              r={r}
-              stroke={seg.color}
-              strokeDasharray={`${len} ${c - len}`}
-              strokeDashoffset={-offset}
-            />
-          );
-          offset += len;
-          return el;
-        })}
+        {segments.map((seg, i) => (
+          <circle
+            key={i}
+            cx={80}
+            cy={80}
+            r={r}
+            stroke={seg.color}
+            strokeDasharray={`${lengths[i]} ${c - lengths[i]}`}
+            strokeDashoffset={-offsets[i]}
+          />
+        ))}
       </g>
       {centerTop ? (
         <text

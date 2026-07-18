@@ -52,7 +52,7 @@ export default function GoalsPage() {
     setContributeAmount('');
   };
 
-  const goalsList: Goal[] = goals ?? [];
+  const goalsList: Goal[] = useMemo(() => goals ?? [], [goals]);
   const summary = useMemo(() => {
     const active = goalsList.filter((g) => !g.is_completed);
     const saved = goalsList.reduce((s, g) => s + g.current_amount, 0);

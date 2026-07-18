@@ -34,9 +34,12 @@ export default function TransactionsPage() {
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState('');
 
-  const accounts = accountsData?.data ?? [];
-  const categories = categoriesData ?? [];
-  const transactions: TransactionResponse[] = transactionsData?.data ?? [];
+  const accounts = useMemo(() => accountsData?.data ?? [], [accountsData]);
+  const categories = useMemo(() => categoriesData ?? [], [categoriesData]);
+  const transactions: TransactionResponse[] = useMemo(
+    () => transactionsData?.data ?? [],
+    [transactionsData],
+  );
 
   const catMap = useMemo(() => {
     const m = new Map<string, { name: string; color: string }>();

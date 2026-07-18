@@ -38,7 +38,10 @@ export default function AccountsPage() {
   const deleteMutation = useDeleteAccount();
   const [showForm, setShowForm] = useState(false);
 
-  const accounts: AccountResponse[] = accountsData?.data ?? [];
+  const accounts: AccountResponse[] = useMemo(
+    () => accountsData?.data ?? [],
+    [accountsData],
+  );
   const netWorth = useMemo(
     () => accounts.reduce((s, a) => s + Number(a.balance), 0),
     [accounts],

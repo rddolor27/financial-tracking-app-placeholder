@@ -40,7 +40,7 @@ export default function DashboardPage() {
   const { data: categories } = useCategories();
   const { data: goals } = useGoals();
 
-  const accounts = accountsData?.data ?? [];
+  const accounts = useMemo(() => accountsData?.data ?? [], [accountsData]);
   const recent = txData?.data ?? [];
   const catMap = useMemo(() => {
     const m = new Map<string, { name: string; color: string; icon?: string }>();
@@ -82,14 +82,12 @@ export default function DashboardPage() {
       const signed = t.type === 'income' ? Number(t.total) : -Number(t.total);
       byMonth.set(t.month, (byMonth.get(t.month) ?? 0) + signed);
     });
-    let running = 0;
-    return [...byMonth.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([month, net]) => {
-        running += net;
-        const label = new Date(`${month}-01`).toLocaleDateString('en-US', { month: 'short' });
-        return { label, value: running };
-      });
+    const sorted = [...byMonth.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    return sorted.map(([month], i) => {
+      const value = sorted.slice(0, i + 1).reduce((sum, [, net]) => sum + net, 0);
+      const label = new Date(`${month}-01`).toLocaleDateString('en-US', { month: 'short' });
+      return { label, value };
+    });
   }, [trends]);
 
   // Top budgets joined with spending totals

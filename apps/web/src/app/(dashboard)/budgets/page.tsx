@@ -44,7 +44,10 @@ export default function BudgetsPage() {
   const deleteMutation = useDeleteBudget();
   const [showForm, setShowForm] = useState(false);
 
-  const budgets: BudgetResponse[] = budgetsData?.data ?? [];
+  const budgets: BudgetResponse[] = useMemo(
+    () => budgetsData?.data ?? [],
+    [budgetsData],
+  );
   const catMap = useMemo(() => {
     const m = new Map<string, { name: string; type: string }>();
     (categories as Array<{ id: string; name: string; type: string }>).forEach((c) =>

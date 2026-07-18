@@ -54,7 +54,7 @@ export default function InvestmentsPage() {
     defaultValues: { quantity: 0, avg_buy_price: 0, currency: 'USD' },
   });
 
-  const investments = investmentsData?.data ?? [];
+  const investments = useMemo(() => investmentsData?.data ?? [], [investmentsData]);
   const investmentAccounts = (accountsData?.data ?? []).filter((a) => a.type === 'investment');
 
   const stats = useMemo(() => {
